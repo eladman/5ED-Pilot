@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>5ED — תוכנית אימון אישית | חמש אצבעות</title>
-<meta name="description" content="מאמן AI שבונה לך תוכנית אימון אישית. 30 יום. שיפור אמיתי. הירשמו לפיילוט.">
+<meta name="description" content="מימוש פוטנציאל כמו שעוד לא הכרתם. טכנולוגיית AI שמנתחת ביצועים ובונה תוכנית אימון אישית לכל מתאמן.">
 
 <!-- OG for WhatsApp sharing -->
 <meta property="og:title" content="5ED — תוכנית אימון אישית | חמש אצבעות">
@@ -18,8 +21,11 @@
 <style>
   :root {
     --orange: #FF8714;
+    --orange-bright: #FFA04D;
+    --orange-deep: #E06800;
     --orange-glow: #FF871440;
     --dark: #0A0A0F;
+    --dark-surface: #0D0D14;
     --dark-card: #141419;
     --dark-border: #1E1E26;
     --white: #FFFFFF;
@@ -28,6 +34,8 @@
     --green: #22C55E;
     --font-display: 'Oswald', sans-serif;
     --font-body: 'Heebo', sans-serif;
+    --transition-smooth: cubic-bezier(.4,0,.2,1);
+    --transition-bounce: cubic-bezier(.34,1.56,.64,1);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,6 +58,59 @@
     z-index: 9999;
   }
 
+  /* --- STICKY NAV --- */
+  .sticky-nav {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(10, 10, 15, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--dark-border);
+    border-radius: 100px;
+    padding: 10px 12px 10px 24px;
+    transition: transform 0.4s var(--transition-smooth), opacity 0.4s var(--transition-smooth);
+    opacity: 0;
+  }
+
+  .sticky-nav.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .sticky-nav-logo {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .sticky-nav-logo span { color: var(--orange); }
+
+  .sticky-nav-cta {
+    background: var(--orange);
+    color: var(--dark);
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.3s var(--transition-smooth);
+  }
+
+  .sticky-nav-cta:hover {
+    background: var(--orange-bright);
+  }
+
   /* --- HERO --- */
   .hero {
     min-height: 100svh;
@@ -63,16 +124,49 @@
     overflow: hidden;
   }
 
-  .hero::before {
-    content: '';
+  .hero-glow {
     position: absolute;
-    width: 600px;
-    height: 600px;
+    width: 700px;
+    height: 700px;
     background: radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
-    top: -200px;
+    top: -250px;
     left: 50%;
     transform: translateX(-50%);
     pointer-events: none;
+    will-change: transform;
+  }
+
+  /* Floating geometric shapes */
+  .hero-shape {
+    position: absolute;
+    border: 1px solid rgba(255, 135, 20, 0.08);
+    pointer-events: none;
+    border-radius: 50%;
+  }
+
+  .hero-shape:nth-child(2) {
+    width: 120px;
+    height: 120px;
+    top: 15%;
+    right: 10%;
+    animation: floatShape 20s ease-in-out infinite;
+  }
+
+  .hero-shape:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 25%;
+    left: 8%;
+    border-radius: 4px;
+    animation: floatShape 25s ease-in-out infinite reverse;
+  }
+
+  .hero-shape:nth-child(4) {
+    width: 60px;
+    height: 60px;
+    top: 30%;
+    left: 15%;
+    animation: floatShape 18s ease-in-out infinite 3s;
   }
 
   .badge {
@@ -88,6 +182,8 @@
     font-weight: 500;
     margin-bottom: 28px;
     animation: fadeUp 0.8s ease both;
+    position: relative;
+    overflow: hidden;
   }
 
   .badge::before {
@@ -97,6 +193,18 @@
     background: var(--green);
     border-radius: 50%;
     animation: pulse 2s ease infinite;
+    flex-shrink: 0;
+  }
+
+  .badge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    animation: badgeSweep 4s ease-in-out infinite 2s;
   }
 
   h1 {
@@ -110,8 +218,13 @@
   }
 
   h1 span {
-    color: var(--orange);
     display: block;
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-bright) 50%, var(--orange) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerText 4s ease-in-out infinite;
   }
 
   .hero-sub {
@@ -137,7 +250,7 @@
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    transition: all 0.3s var(--transition-smooth);
     animation: fadeUp 0.8s ease 0.3s both;
   }
 
@@ -157,36 +270,61 @@
   }
 
   /* --- STATS --- */
-  .stats {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
+  .stats-wrapper {
+    max-width: 540px;
+    margin: 0 auto;
     padding: 0 24px 60px;
     animation: fadeUp 0.8s ease 0.4s both;
   }
 
+  .stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 16px;
+    padding: 28px 0;
+  }
+
   .stat {
     text-align: center;
+    flex: 1;
+    position: relative;
+  }
+
+  .stat:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 40px;
+    background: var(--dark-border);
   }
 
   .stat-num {
     font-family: var(--font-display);
-    font-size: 36px;
+    font-size: 40px;
     font-weight: 700;
     color: var(--orange);
+    line-height: 1;
   }
 
   .stat-label {
     font-size: 13px;
     color: var(--gray);
-    margin-top: 4px;
+    margin-top: 6px;
   }
+
 
   /* --- SECTION --- */
   section {
     padding: 80px 24px;
     max-width: 640px;
     margin: 0 auto;
+    position: relative;
   }
 
   .section-label {
@@ -197,6 +335,17 @@
     color: var(--orange);
     text-transform: uppercase;
     margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 20px;
+    height: 2px;
+    background: var(--orange);
+    flex-shrink: 0;
   }
 
   h2 {
@@ -219,12 +368,40 @@
     margin-bottom: 20px;
   }
 
+  /* Section radial decoration */
+  .section-glow {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,135,20,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    top: 50%;
+    left: -100px;
+    transform: translateY(-50%);
+  }
+
   /* --- HOW IT WORKS --- */
   .steps {
     display: flex;
     flex-direction: column;
     gap: 24px;
     margin-top: 40px;
+  }
+
+  .steps-timeline {
+    position: relative;
+  }
+
+  .steps-timeline::before {
+    content: '';
+    position: absolute;
+    right: 41px;
+    top: 24px;
+    bottom: 24px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--orange) 0%, var(--dark-border) 100%);
+    z-index: 0;
+    pointer-events: none;
   }
 
   .step {
@@ -235,14 +412,8 @@
     border: 1px solid var(--dark-border);
     border-radius: 16px;
     padding: 24px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
-  }
-
-  .step.visible {
-    opacity: 1;
-    transform: translateY(0);
+    position: relative;
+    z-index: 1;
   }
 
   .step-num {
@@ -268,18 +439,55 @@
     line-height: 1.6;
   }
 
-  /* --- COACH PREVIEW --- */
-  .coach-preview {
+  /* --- COACH PREVIEW — PHONE MOCKUP --- */
+  .phone-mockup {
+    max-width: 380px;
+    margin: 40px auto 0;
     background: var(--dark-card);
     border: 1px solid var(--dark-border);
-    border-radius: 20px;
-    padding: 28px;
-    margin-top: 40px;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .phone-notch {
+    width: 120px;
+    height: 24px;
+    background: var(--dark);
+    border-radius: 0 0 16px 16px;
+    margin: 0 auto;
+  }
+
+  .phone-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--dark-border);
+  }
+
+  .phone-header-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+
+  .phone-header-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .phone-body {
+    padding: 20px;
+    min-height: 280px;
     position: relative;
     overflow: hidden;
   }
 
-  .coach-preview::before {
+  .phone-body::before {
     content: '';
     position: absolute;
     top: 0;
@@ -295,6 +503,14 @@
     gap: 12px;
     margin-bottom: 16px;
     align-items: flex-start;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.5s var(--transition-smooth);
+  }
+
+  .coach-msg.msg-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .coach-avatar {
@@ -319,71 +535,127 @@
     max-width: 85%;
   }
 
-  .coach-tag {
-    font-size: 11px;
-    color: var(--gray);
-    margin-bottom: 16px;
-    padding-right: 48px;
+  .typing-indicator {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    opacity: 0;
+    transition: opacity 0.4s var(--transition-smooth);
   }
 
+  .typing-indicator.msg-visible {
+    opacity: 1;
+  }
+
+  .typing-dots {
+    background: #1E1E26;
+    border-radius: 14px 14px 4px 14px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .typing-dots span {
+    width: 6px;
+    height: 6px;
+    background: var(--gray);
+    border-radius: 50%;
+    animation: typingBounce 1.4s ease-in-out infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
   /* --- GOALS --- */
-  .goals {
+
+  /* --- FAQ --- */
+  .faq-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     margin-top: 32px;
   }
 
-  .goal-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  .faq-item {
     background: var(--dark-card);
     border: 1px solid var(--dark-border);
     border-radius: 14px;
-    padding: 20px;
-    transition: all 0.3s ease;
+    overflow: hidden;
+    transition: border-color 0.3s var(--transition-smooth);
   }
 
-  .goal-card:hover {
-    border-color: var(--orange);
-    transform: translateX(-4px);
+  .faq-item.open {
+    border-color: rgba(255, 135, 20, 0.3);
   }
 
-  .goal-emoji {
-    font-size: 28px;
-    width: 48px;
-    height: 48px;
-    background: #1E1E26;
-    border-radius: 12px;
+  .faq-question {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .goal-name {
+    justify-content: space-between;
+    padding: 20px 24px;
+    cursor: pointer;
     font-family: var(--font-display);
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 2px;
+    background: none;
+    border: none;
+    color: var(--white);
+    width: 100%;
+    text-align: right;
+    gap: 16px;
   }
 
-  .goal-desc {
-    font-size: 13px;
+  .faq-icon {
+    font-size: 20px;
+    color: var(--orange);
+    transition: transform 0.3s var(--transition-smooth);
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .faq-item.open .faq-icon {
+    transform: rotate(45deg);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s var(--transition-smooth);
+  }
+
+  .faq-answer-inner {
+    padding: 0 24px 20px;
+    font-size: 14px;
     color: var(--gray);
+    line-height: 1.8;
   }
 
   /* --- FORM --- */
   .form-section {
     background: linear-gradient(180deg, var(--dark) 0%, #0F0F16 100%);
     padding: 80px 24px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .form-glow {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,135,20,0.06) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 
   .form-wrapper {
     max-width: 480px;
     margin: 0 auto;
     text-align: center;
+    position: relative;
+    z-index: 1;
   }
 
   .form-wrapper h2 {
@@ -391,7 +663,37 @@
   }
 
   .form-wrapper .text {
-    margin-bottom: 36px;
+    margin-bottom: 24px;
+  }
+
+  .spots-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 100px;
+    margin-bottom: 32px;
+  }
+
+  .spots-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+
+  .form-card {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 20px;
+    padding: 32px 28px;
   }
 
   .form {
@@ -416,7 +718,7 @@
   .form-group input,
   .form-group select,
   .form-group textarea {
-    background: var(--dark-card);
+    background: var(--dark-surface);
     border: 1px solid var(--dark-border);
     border-radius: 12px;
     padding: 14px 16px;
@@ -432,6 +734,14 @@
   .form-group select:focus,
   .form-group textarea:focus {
     border-color: var(--orange);
+  }
+
+  .form-group input:valid:not(:placeholder-shown) {
+    border-color: rgba(34, 197, 94, 0.4);
+  }
+
+  .form-group input:invalid:not(:placeholder-shown):not(:focus) {
+    border-color: rgba(239, 68, 68, 0.4);
   }
 
   .form-group select {
@@ -468,7 +778,7 @@
     border-radius: 14px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    transition: all 0.3s var(--transition-smooth);
     margin-top: 8px;
   }
 
@@ -523,7 +833,7 @@
   /* --- FOOTER --- */
   footer {
     text-align: center;
-    padding: 40px 24px;
+    padding: 48px 24px 40px;
     border-top: 1px solid var(--dark-border);
   }
 
@@ -536,9 +846,67 @@
 
   .footer-logo span { color: var(--orange); }
 
-  footer p {
+  .footer-tagline {
+    font-size: 14px;
+    color: var(--light-gray);
+    margin-bottom: 20px;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
     font-size: 13px;
     color: var(--gray);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--orange);
+  }
+
+  footer .footer-copy {
+    font-size: 13px;
+    color: var(--gray);
+  }
+
+  /* --- BACK TO TOP --- */
+  .back-to-top {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    width: 44px;
+    height: 44px;
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--light-gray);
+    cursor: pointer;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s var(--transition-smooth);
+    text-decoration: none;
+  }
+
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .back-to-top:hover {
+    border-color: var(--orange);
+    color: var(--orange);
   }
 
   /* --- ANIMATIONS --- */
@@ -557,11 +925,33 @@
     50% { transform: translateX(-50%) translateY(6px); }
   }
 
-  /* --- REVEAL --- */
+  @keyframes shimmerText {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 200% center; }
+  }
+
+  @keyframes badgeSweep {
+    0%, 100% { left: -100%; }
+    50% { left: 100%; }
+  }
+
+  @keyframes floatShape {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(15px, -20px) rotate(5deg); }
+    66% { transform: translate(-10px, 10px) rotate(-3deg); }
+  }
+
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+
+  /* --- REVEAL SYSTEM --- */
   .reveal {
     opacity: 0;
     transform: translateY(30px);
-    transition: all 0.6s cubic-bezier(.4,0,.2,1);
+    transition: all 0.6s var(--transition-smooth);
   }
 
   .reveal.visible {
@@ -569,53 +959,136 @@
     transform: translateY(0);
   }
 
-  /* --- RESPONSIVE --- */
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: all 0.6s var(--transition-smooth);
+  }
+
+  .reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.6s var(--transition-smooth);
+  }
+
+  .reveal-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Step reveal (used in steps that aren't in timeline) */
+  .step {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+  }
+
+  .step.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* --- SCROLL-DRIVEN ANIMATIONS (Progressive Enhancement) --- */
+  @supports (animation-timeline: scroll()) {
+    .hero-glow {
+      animation: parallaxGlow linear;
+      animation-timeline: scroll();
+      animation-range: 0 40vh;
+    }
+
+    @keyframes parallaxGlow {
+      from { transform: translateX(-50%) translateY(0); }
+      to { transform: translateX(-50%) translateY(60px); }
+    }
+  }
+
+  /* --- RESPONSIVE: TABLET --- */
+  @media (max-width: 768px) {
+    .hero-shape:nth-child(2) { right: 5%; }
+    .hero-shape:nth-child(4) { left: 5%; }
+    .phone-mockup { max-width: 340px; }
+.form-card { padding: 28px 20px; }
+  }
+
+  /* --- RESPONSIVE: MOBILE --- */
   @media (max-width: 480px) {
-    .stats { gap: 24px; }
-    .stat-num { font-size: 28px; }
+    .stats { flex-direction: row; }
+    .stat-num { font-size: 32px; }
     .form-row { grid-template-columns: 1fr; }
     section { padding: 60px 20px; }
     .coach-bubble { max-width: 92%; }
+    .phone-mockup { max-width: 100%; border-radius: 24px; }
+    .phone-notch { width: 100px; height: 20px; }
+    .steps-timeline::before { right: 37px; }
+.faq-question { font-size: 15px; padding: 18px 20px; }
+    .faq-answer-inner { padding: 0 20px 18px; }
+    .form-card { padding: 24px 16px; }
+    .footer-links { gap: 16px; }
+    .sticky-nav { padding: 8px 10px 8px 18px; gap: 12px; }
+    .sticky-nav-logo { font-size: 14px; }
+    .sticky-nav-cta { font-size: 12px; padding: 6px 16px; }
   }
 </style>
 </head>
 <body>
 
+<!-- STICKY NAV -->
+<nav class="sticky-nav" id="stickyNav">
+  <div class="sticky-nav-logo">5<span>ED</span> × חמש אצבעות</div>
+  <a href="#register" class="sticky-nav-cta">הירשמו עכשיו</a>
+</nav>
+
+<!-- BACK TO TOP -->
+<a href="#" class="back-to-top" id="backToTop" aria-label="חזרה למעלה">↑</a>
+
 <!-- HERO -->
-<div class="hero">
-  <div class="badge">פיילוט חמש אצבעות × AI — מקומות מוגבלים</div>
-  <h1>מאמן AI שבונה לך<span>תוכנית אימון אישית</span></h1>
-  <p class="hero-sub">30 יום. תוכנית מותאמת למטרה שלך. שיפור אמיתי — בגוף ובראש. הירשמו לרשימת ההמתנה לפיילוט הראשון.</p>
-  <a href="#register" class="cta-btn">רוצה להיות ראשון/ה →</a>
+<div class="hero" id="heroSection">
+  <div class="hero-glow"></div>
+  <div class="hero-shape"></div>
+  <div class="hero-shape"></div>
+  <div class="hero-shape"></div>
+  <div class="badge">פיילוט חמש אצבעות — מקומות מוגבלים</div>
+  <h1>מימוש פוטנציאל<span>כמו שעוד לא הכרתם</span></h1>
+  <p class="hero-sub"> בואו לקחת חלק בפיילוט ראשוני של אפליקציית חמש אצבעות ולהיות הראשונים שמשתמשים בבינה מלאכותית כדי לשפר כושר ותוצאות. ולהשפיע על עתיד החינוך והכושר בישראל</p>
+  <a href="#register" class="cta-btn">רוצה להיות ראשון/ה </a>
   <div class="scroll-hint">↓ גלול למטה</div>
 </div>
 
 <!-- STATS -->
-<div class="stats">
-  <div class="stat">
-    <div class="stat-num">30</div>
-    <div class="stat-label">ימי תוכנית</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">AI</div>
-    <div class="stat-label">מאמן אישי</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">0₪</div>
-    <div class="stat-label">חינם לפיילוט</div>
+<div class="stats-wrapper" id="statsSection">
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" data-count="30">0</div>
+      <div class="stat-label">ימי תוכנית</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">AI</div>
+      <div class="stat-label">מאמן אישי</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" data-count="0" data-suffix="₪">0₪</div>
+      <div class="stat-label">חינם לפיילוט</div>
+    </div>
   </div>
 </div>
 
+
 <!-- WHAT IS THIS -->
 <section>
+  <div class="section-glow"></div>
   <div class="reveal">
     <div class="section-label">מה זה?</div>
-    <h2>לא עוד אפליקציית כושר.<br><em>תוכנית אימון שבנויה בשבילך.</em></h2>
+    <h2>לא עוד אפליקציית כושר.<br><em>דרך חדשה להגיע לפוטנציאל שלך</em></h2>
     <p class="text">
-      אנחנו בונים משהו חדש בחמש אצבעות — מאמן AI שמכיר אותך, יודע מה המטרה שלך, ובונה לך תוכנית אימון אישית שמשתפרת כל שבוע.
+      אנחנו בונים משהו חדש בחמש אצבעות , מאמן AI שמכיר אותך, יודע מה המטרה שלך, ובונה לך תוכנית אימון אישית שמשתפרת כל שבוע.
     </p>
     <p class="text">
-      לא אתגרים רנדומליים. לא "עשה 30 שכיבות." תוכנית אמיתית — אינטרוולים, כוח, טמפו, שחזור — מותאמת בדיוק למה שאתה רוצה להשיג. והמאמן AI מלווה אותך כל יום.
+     האפליקציה תלווה אותך בכל יום במקביל לאימונים בחמש אצבעות ותשפר אותך 24/7. כל יום 1% יותר, אנחנו מאמנים שככה מגיעים לתוצאות הטובות ביותר
     </p>
   </div>
 </section>
@@ -627,29 +1100,29 @@
     <h2>4 צעדים.<br><em>מהרשמה לשיאים.</em></h2>
   </div>
 
-  <div class="steps">
-    <div class="step">
+  <div class="steps steps-timeline">
+    <div class="step" data-delay="0">
       <div class="step-num">01</div>
       <div class="step-content">
         <h3>בוחרים מטרה</h3>
         <p>רוצה לרוץ יותר מהר? להיות יותר חזק? להגיע מוכן לצבא? המאמן AI מתחיל מהמטרה שלך.</p>
       </div>
     </div>
-    <div class="step">
+    <div class="step" data-delay="100">
       <div class="step-num">02</div>
       <div class="step-content">
         <h3>בדיקת רמה</h3>
         <p>מבחן קצר (3 דקות) — כמה שכיבות, כמה ריצה, כמה פלאנק. ככה המאמן יודע מאיפה מתחילים.</p>
       </div>
     </div>
-    <div class="step">
+    <div class="step" data-delay="200">
       <div class="step-num">03</div>
       <div class="step-content">
         <h3>התוכנית נבנית</h3>
         <p>המאמן AI בונה לך 30 יום של אימונים — מותאמים למטרה, לרמה, ולימים שלך. כל שבוע קשה יותר.</p>
       </div>
     </div>
-    <div class="step">
+    <div class="step" data-delay="300">
       <div class="step-num">04</div>
       <div class="step-content">
         <h3>מתאמנים ושוברים שיאים</h3>
@@ -663,68 +1136,40 @@
 <section>
   <div class="reveal">
     <div class="section-label">המאמן AI</div>
-    <h2>לא צ'אטבוט.<br><em>מאמן שמכיר אותך.</em></h2>
+    <h2>לא צ'אטבוט.<br><em>מאמן מאמן מקצועי שמכיר אותך.</em></h2>
     <p class="text">
-      המאמן AI זוכר כל אימון. יודע מתי קשה לך ומתי אתה עף. מתאים את התוכנית בזמן אמת. ולא נותן לך לוותר.
+      ה-AI שלנו נבנה ביחד עם המחלקה המקצועית ומבוסס על עקרונות האימון של חמש אצבעות. בנוסף הוא גם לומד אותך ומעצב את התוכנית תוך כדי תנועה כדי למקסם את התוצאות שלך
     </p>
   </div>
 
-  <div class="coach-preview reveal">
-    <div class="coach-tag">דוגמה — אחרי אימון אינטרוולים</div>
-    <div class="coach-msg">
-      <div class="coach-avatar">🔥</div>
-      <div class="coach-bubble">
-        6 אינטרוולים. סיימת. 💪<br><br>
-        שבוע שעבר באינטרוול 5 רצית לעצור. היום עברת את ה-5 בלי לחשוב.<br><br>
-        <strong>הפער שלך גדל.</strong> זה לא רק כושר — זה הראש שלך שהשתנה.
-      </div>
+  <div class="phone-mockup reveal-scale" id="coachPhone">
+    <div class="phone-notch"></div>
+    <div class="phone-header">
+      <div class="phone-header-dot"></div>
+      <div class="phone-header-title">המאמן שלך</div>
     </div>
-    <div class="coach-msg">
-      <div class="coach-avatar">🔥</div>
-      <div class="coach-bubble">
-        שאלה אחת לפני שסוגר: באינטרוול האחרון, כשהיה הכי קשה — מה אמרת לעצמך?
+    <div class="phone-body">
+      <div class="coach-msg" data-msg="1">
+        <div class="coach-avatar">🔥</div>
+        <div class="coach-bubble">
+          6 אינטרוולים. סיימת. 💪<br><br>
+          שבוע שעבר באינטרוול 5 רצית לעצור. היום עברת את ה-5 בלי לחשוב.<br><br>
+          <strong>הפער שלך גדל.</strong> זה לא רק כושר — זה הראש שלך שהשתנה.
+        </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- GOALS -->
-<section>
-  <div class="reveal">
-    <div class="section-label">בחר/י מטרה</div>
-    <h2>מה אתה רוצה<br><em>להשיג?</em></h2>
-    <p class="text">
-      התוכנית מותאמת למטרה שלך. בחר/י את מה שהכי חשוב לך — והמאמן AI יבנה סביב זה.
-    </p>
-  </div>
-
-  <div class="goals reveal">
-    <div class="goal-card">
-      <div class="goal-emoji">🏃</div>
-      <div>
-        <div class="goal-name">לרוץ יותר מהר / יותר רחוק</div>
-        <div class="goal-desc">אינטרוולים, טמפו, ריצות ארוכות — תוכנית ריצה אישית</div>
+      <div class="coach-msg" data-msg="2">
+        <div class="coach-avatar">🔥</div>
+        <div class="coach-bubble">
+          שאלה אחת לפני שסוגר: באינטרוול האחרון, כשהיה הכי קשה — מה אמרת לעצמך?
+        </div>
       </div>
-    </div>
-    <div class="goal-card">
-      <div class="goal-emoji">💪</div>
-      <div>
-        <div class="goal-name">להיות יותר חזק/ה</div>
-        <div class="goal-desc">חיזוקים, מעגלי כוח, core — בלי ציוד, בכל מקום</div>
-      </div>
-    </div>
-    <div class="goal-card">
-      <div class="goal-emoji">⚽</div>
-      <div>
-        <div class="goal-name">להשתפר בספורט</div>
-        <div class="goal-desc">מהירות, אג׳יליטי, כוח נפיץ — מותאם לסוג הספורט</div>
-      </div>
-    </div>
-    <div class="goal-card">
-      <div class="goal-emoji">🎖️</div>
-      <div>
-        <div class="goal-name">להגיע מוכן/ה לצבא</div>
-        <div class="goal-desc">ריצת 2 ק״מ, שכיבות, סבולת כוח — תוכנית הכנה מלאה</div>
+      <div class="typing-indicator" data-msg="3">
+        <div class="coach-avatar">🔥</div>
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
     </div>
   </div>
@@ -733,37 +1178,86 @@
 <!-- WHAT YOU GET -->
 <section>
   <div class="reveal">
-    <div class="section-label">מה מקבלים</div>
+    <div class="section-label">מה כולל הפיילוט</div>
     <h2>30 יום של<br><em>שיפור אמיתי</em></h2>
   </div>
 
   <div class="steps">
-    <div class="step">
+    <div class="step" data-delay="0">
       <div class="step-num">📱</div>
       <div class="step-content">
-        <h3>אימון יומי באפליקציה</h3>
-        <p>כל בוקר — האימון שלך מחכה. 20-40 דקות, ברור ומדויק. המאמן מסביר מה עושים ולמה.</p>
+        <h3>גישה בלעדית לממשק חדש לגמרי באפליקציה וכלי AI</h3>
+        <p>תהיו הראשונים לנסות את הטכנולוגיה החדשה — ממשק מתקדם עם מאמן AI אישי שבונה לכם תוכנית אימון מותאמת.</p>
       </div>
     </div>
-    <div class="step">
-      <div class="step-num">📊</div>
-      <div class="step-content">
-        <h3>שיאים אישיים ומעקב</h3>
-        <p>רואים בדיוק כמה השתפרתם — ריצה, כוח, סבולת. גרפים ברורים, before ו-after.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">🧠</div>
-      <div class="step-content">
-        <h3>הראש חזק כמו הגוף</h3>
-        <p>לומדים להתמודד עם הרגע שהגוף אומר "מספיק" — ולהמשיך. בונים מנטליות של אלופים.</p>
-      </div>
-    </div>
-    <div class="step">
+    <div class="step" data-delay="100">
       <div class="step-num">🤝</div>
       <div class="step-content">
-        <h3>חלק מקבוצה שלא מוותרת</h3>
-        <p>לא לבד. חלק מקבוצת מתאמנים שדוחפת אחד את השני. בדיוק כמו בחמש אצבעות.</p>
+        <h3>השתתפות ב-3 מפגשי פיילוט מצומצמים</h3>
+        <p>מפגשים עם צוות האפליקציה וכל משתתפי הפיילוט — לשתף חוויות, לתת פידבק, ולהיות חלק מהסיפור.</p>
+      </div>
+    </div>
+    <div class="step" data-delay="200">
+      <div class="step-num">💬</div>
+      <div class="step-content">
+        <h3>תקשורת רציפה והשפעה ישירה</h3>
+        <p>קו פתוח לצוות הפיתוח. הדעה שלכם משנה — תשפיעו ישירות על עתיד האפליקציה.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <div class="reveal">
+    <div class="section-label">שאלות נפוצות</div>
+    <h2>יש שאלות?<br><em>יש תשובות.</em></h2>
+  </div>
+
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+        <span>זה באמת בחינם?</span>
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">כן. הפיילוט הראשון הוא לגמרי בחינם. אנחנו בשלב בנייה ורוצים לבדוק את המערכת עם קבוצה קטנה. בתמורה — אתם מקבלים תוכנית אימון אישית, ואנחנו מקבלים פידבק שעוזר לנו להשתפר.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+        <span>צריך ציוד מיוחד?</span>
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">לא. התוכנית מבוססת על אימוני משקל גוף — שכיבות, ריצה, פלאנק, ועוד. אפשר להתאמן בבית, בפארק, או בחצר. אם יש לך ציוד — המאמן ישלב אותו.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+        <span>כמה זמן כל אימון?</span>
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">בין 20 ל-40 דקות, תלוי ביום ובסוג האימון. יש ימי ריצה קצרים ויש ימי כוח ארוכים יותר. הכל מותאם ללו״ז שלך.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+        <span>אין לי ניסיון באימונים — זה בסדר?</span>
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">בהחלט. המאמן AI מתאים את התוכנית לרמה שלך. אם מתחילים מאפס — התוכנית תהיה מתאימה. אם כבר יש רמה — היא תהיה מאתגרת.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+        <span>צריך אישור הורים?</span>
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">כן. הפיילוט מיועד לגילאי 12-17. נבקש אישור הורים לפני ההתחלה — ניצור קשר דרך ה-WhatsApp שתשאירו בטופס.</div>
       </div>
     </div>
   </div>
@@ -771,58 +1265,62 @@
 
 <!-- FORM -->
 <div class="form-section" id="register">
+  <div class="form-glow"></div>
   <div class="form-wrapper">
     <div class="reveal">
       <div class="section-label">הרשמה לפיילוט</div>
       <h2>רוצה להיות<br><em>ראשון/ה?</em></h2>
-      <p class="text">מקומות מוגבלים. 10-15 מתאמנים בלבד. בחינם. השאירו פרטים ונחזור אליכם.</p>
+      <p class="text">מקומות מוגבלים. 20-30 מתאמנים בלבד. השאירו פרטים ונחזור אליכם.</p>
+      <div class="spots-badge">נשארו 7 מקומות מתוך 15</div>
     </div>
 
-    <form class="form reveal" id="waitlistForm" onsubmit="handleSubmit(event)">
-      <div class="form-group">
-        <label for="name">שם מלא</label>
-        <input type="text" id="name" name="name" required placeholder="השם שלך">
-      </div>
-
-      <div class="form-row">
+    <div class="form-card reveal">
+      <form class="form" id="waitlistForm" onsubmit="handleSubmit(event)">
         <div class="form-group">
-          <label for="age">גיל</label>
-          <select id="age" name="age" required>
-            <option value="" disabled selected>בחר/י</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16">16</option>
-            <option value="17">17</option>
+          <label for="name">שם מלא</label>
+          <input type="text" id="name" name="name" required placeholder="השם שלך">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="age">גיל</label>
+            <select id="age" name="age" required>
+              <option value="" disabled selected>בחר/י</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="phone">טלפון (WhatsApp)</label>
+            <input type="tel" id="phone" name="phone" required placeholder="050-0000000" dir="ltr">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="goal">מה הכי חשוב לך להשיג?</label>
+          <select id="goal" name="goal" required>
+            <option value="" disabled selected>בחר/י מטרה</option>
+            <option value="running">לרוץ יותר מהר / יותר רחוק</option>
+            <option value="strength">להיות יותר חזק/ה</option>
+            <option value="sport">להשתפר בספורט</option>
+            <option value="army">להגיע מוכן/ה לצבא</option>
+            <option value="other">אחר</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label for="phone">טלפון (WhatsApp)</label>
-          <input type="tel" id="phone" name="phone" required placeholder="050-0000000" dir="ltr">
+          <label for="freetext">עוד משהו שחשוב לך שנדע? (אופציונלי)</label>
+          <textarea id="freetext" name="freetext" placeholder="למשל: באיזה ספורט אתה משחק, כמה פעמים בשבוע אתה מתאמן..."></textarea>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="goal">מה הכי חשוב לך להשיג?</label>
-        <select id="goal" name="goal" required>
-          <option value="" disabled selected>בחר/י מטרה</option>
-          <option value="running">לרוץ יותר מהר / יותר רחוק</option>
-          <option value="strength">להיות יותר חזק/ה</option>
-          <option value="sport">להשתפר בספורט</option>
-          <option value="army">להגיע מוכן/ה לצבא</option>
-          <option value="other">אחר</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="freetext">עוד משהו שחשוב לך שנדע? (אופציונלי)</label>
-        <textarea id="freetext" name="freetext" placeholder="למשל: באיזה ספורט אתה משחק, כמה פעמים בשבוע אתה מתאמן..."></textarea>
-      </div>
-
-      <button type="submit" class="submit-btn" id="submitBtn">הירשמו לרשימת ההמתנה ✋</button>
-      <div class="form-note">המקומות באמת מוגבלים. 10-15 מתאמנים בלבד. חינם.</div>
-    </form>
+        <button type="submit" class="submit-btn" id="submitBtn">הירשמו לרשימת ההמתנה ✋</button>
+        <div class="form-note">המקומות באמת מוגבלים. 10-15 מתאמנים בלבד. חינם.</div>
+      </form>
+    </div>
 
     <div class="success-msg" id="successMsg">
       <div class="success-emoji">✋</div>
@@ -835,34 +1333,147 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">5<span>ED</span> × חמש אצבעות</div>
-  <p>פיילוט תוכנית אימון אישית | 2026</p>
+  <p class="footer-tagline">מאמן AI שבונה לך תוכנית אימון אישית</p>
+  <div class="footer-links">
+    <a href="#register">הרשמה לפיילוט</a>
+    <a href="https://wa.me/972500000000" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="mailto:info@5ed.co.il">יצירת קשר</a>
+  </div>
+  <p class="footer-copy">פיילוט תוכנית אימון אישית | 2026</p>
 </footer>
 
 <script>
-// Reveal on scroll
-const reveals = document.querySelectorAll('.reveal, .step');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry, i) => {
+// --- REVEAL ON SCROLL (with data-delay support) ---
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
     if (entry.isIntersecting) {
+      const delay = parseInt(entry.target.dataset.delay) || 0;
       setTimeout(() => {
         entry.target.classList.add('visible');
-      }, i * 80);
-      observer.unobserve(entry.target);
+      }, delay);
+      revealObserver.unobserve(entry.target);
     }
   });
 }, { threshold: 0.15 });
 
-reveals.forEach(el => observer.observe(el));
+document.querySelectorAll('.reveal, .reveal-left, .reveal-scale, .step').forEach(el => {
+  revealObserver.observe(el);
+});
 
-// Smooth scroll
+// --- STICKY NAV (IntersectionObserver) ---
+const stickyNav = document.getElementById('stickyNav');
+const heroSection = document.getElementById('heroSection');
+
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      stickyNav.classList.remove('visible');
+    } else {
+      stickyNav.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+navObserver.observe(heroSection);
+
+// --- BACK TO TOP ---
+const backToTop = document.getElementById('backToTop');
+const statsSection = document.getElementById('statsSection');
+
+const backTopObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      backToTop.classList.remove('visible');
+    } else {
+      backToTop.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -100% 0px' });
+
+backTopObserver.observe(statsSection);
+
+// --- COUNT-UP ANIMATION ---
+const countElements = document.querySelectorAll('[data-count]');
+const countObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      const duration = 1200;
+      const start = performance.now();
+
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(target * eased);
+        el.textContent = current + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+
+      requestAnimationFrame(update);
+      countObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+countElements.forEach(el => countObserver.observe(el));
+
+// --- COACH MESSAGES SEQUENTIAL ANIMATION ---
+const coachPhone = document.getElementById('coachPhone');
+const coachObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const messages = entry.target.querySelectorAll('[data-msg]');
+      messages.forEach((msg, i) => {
+        setTimeout(() => {
+          msg.classList.add('msg-visible');
+        }, 800 * (i + 1));
+      });
+      coachObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+if (coachPhone) coachObserver.observe(coachPhone);
+
+// --- SMOOTH SCROLL ---
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     e.preventDefault();
-    document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
   });
 });
 
-// Form handling
+// --- FAQ ACCORDION ---
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const answer = item.querySelector('.faq-answer');
+  const isOpen = item.classList.contains('open');
+
+  // Close all other items
+  document.querySelectorAll('.faq-item.open').forEach(openItem => {
+    if (openItem !== item) {
+      openItem.classList.remove('open');
+      openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+      openItem.querySelector('.faq-answer').style.maxHeight = '0';
+    }
+  });
+
+  if (isOpen) {
+    item.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    answer.style.maxHeight = '0';
+  } else {
+    item.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    answer.style.maxHeight = answer.scrollHeight + 'px';
+  }
+}
+
+// --- FORM HANDLING ---
 function handleSubmit(e) {
   e.preventDefault();
 
@@ -883,12 +1494,13 @@ function handleSubmit(e) {
   // Option 1: Supabase insert
   // Option 2: Google Sheets webhook
   // Option 3: Simple email via Formspree/Getform
-  
+
   console.log('Waitlist signup:', data);
 
   // For now, simulate success
   setTimeout(() => {
     document.getElementById('waitlistForm').style.display = 'none';
+    document.querySelector('.form-card').style.display = 'none';
     document.getElementById('successMsg').classList.add('show');
   }, 800);
 
@@ -902,6 +1514,7 @@ function handleSubmit(e) {
   .then(r => {
     if (r.ok) {
       document.getElementById('waitlistForm').style.display = 'none';
+      document.querySelector('.form-card').style.display = 'none';
       document.getElementById('successMsg').classList.add('show');
     } else {
       btn.disabled = false;
