@@ -1,1533 +1,2104 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<title>5ED — תוכנית אימון אישית | חמש אצבעות</title>
-<meta name="description" content="מימוש פוטנציאל כמו שעוד לא הכרתם. טכנולוגיית AI שמנתחת ביצועים ובונה תוכנית אימון אישית לכל מתאמן.">
-
-<!-- OG for WhatsApp sharing -->
-<meta property="og:title" content="5ED — תוכנית אימון אישית | חמש אצבעות">
-<meta property="og:description" content="מאמן AI שבונה לך תוכנית אימון אישית. 30 יום. שיפור אמיתי.">
-<meta property="og:type" content="website">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
-
-<style>
-  :root {
-    --orange: #FF8714;
-    --orange-bright: #FFA04D;
-    --orange-deep: #E06800;
-    --orange-glow: #FF871440;
-    --dark: #0A0A0F;
-    --dark-surface: #0D0D14;
-    --dark-card: #141419;
-    --dark-border: #1E1E26;
-    --white: #FFFFFF;
-    --gray: #8E8E9A;
-    --light-gray: #C5C5CF;
-    --green: #22C55E;
-    --font-display: 'Oswald', sans-serif;
-    --font-body: 'Heebo', sans-serif;
-    --transition-smooth: cubic-bezier(.4,0,.2,1);
-    --transition-bounce: cubic-bezier(.34,1.56,.64,1);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: var(--font-body);
-    background: var(--dark);
-    color: var(--white);
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* --- GRAIN OVERLAY --- */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* --- STICKY NAV --- */
-  .sticky-nav {
-    position: fixed;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-80px);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: rgba(10, 10, 15, 0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--dark-border);
-    border-radius: 100px;
-    padding: 10px 12px 10px 24px;
-    transition: transform 0.4s var(--transition-smooth), opacity 0.4s var(--transition-smooth);
-    opacity: 0;
-  }
-
-  .sticky-nav.visible {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-
-  .sticky-nav-logo {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .sticky-nav-logo span { color: var(--orange); }
-
-  .sticky-nav-cta {
-    background: var(--orange);
-    color: var(--dark);
-    font-family: var(--font-display);
-    font-size: 14px;
-    font-weight: 700;
-    padding: 8px 20px;
-    border-radius: 100px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all 0.3s var(--transition-smooth);
-  }
-
-  .sticky-nav-cta:hover {
-    background: var(--orange-bright);
-  }
-
-  /* --- HERO --- */
-  .hero {
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 24px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-glow {
-    position: absolute;
-    width: 700px;
-    height: 700px;
-    background: radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
-    top: -250px;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
-    will-change: transform;
-  }
-
-  /* Floating geometric shapes */
-  .hero-shape {
-    position: absolute;
-    border: 1px solid rgba(255, 135, 20, 0.08);
-    pointer-events: none;
-    border-radius: 50%;
-  }
-
-  .hero-shape:nth-child(2) {
-    width: 120px;
-    height: 120px;
-    top: 15%;
-    right: 10%;
-    animation: floatShape 20s ease-in-out infinite;
-  }
-
-  .hero-shape:nth-child(3) {
-    width: 80px;
-    height: 80px;
-    bottom: 25%;
-    left: 8%;
-    border-radius: 4px;
-    animation: floatShape 25s ease-in-out infinite reverse;
-  }
-
-  .hero-shape:nth-child(4) {
-    width: 60px;
-    height: 60px;
-    top: 30%;
-    left: 15%;
-    animation: floatShape 18s ease-in-out infinite 3s;
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    padding: 8px 16px;
-    border-radius: 100px;
-    font-size: 13px;
-    color: var(--orange);
-    font-weight: 500;
-    margin-bottom: 28px;
-    animation: fadeUp 0.8s ease both;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: pulse 2s ease infinite;
-    flex-shrink: 0;
-  }
-
-  .badge::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-    animation: badgeSweep 4s ease-in-out infinite 2s;
-  }
-
-  h1 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(40px, 10vw, 72px);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 20px;
-    animation: fadeUp 0.8s ease 0.1s both;
-  }
-
-  h1 span {
-    display: block;
-    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-bright) 50%, var(--orange) 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmerText 4s ease-in-out infinite;
-  }
-
-  .hero-sub {
-    font-size: clamp(16px, 4vw, 20px);
-    color: var(--light-gray);
-    max-width: 480px;
-    line-height: 1.7;
-    margin-bottom: 36px;
-    animation: fadeUp 0.8s ease 0.2s both;
-  }
-
-  .cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--orange);
-    color: var(--dark);
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 700;
-    padding: 16px 40px;
-    border-radius: 14px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.3s var(--transition-smooth);
-    animation: fadeUp 0.8s ease 0.3s both;
-  }
-
-  .cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px var(--orange-glow);
-  }
-
-  .scroll-hint {
-    position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    color: var(--gray);
-    animation: bounce 2s ease infinite 1.5s;
-  }
-
-  /* --- STATS --- */
-  .stats-wrapper {
-    max-width: 540px;
-    margin: 0 auto;
-    padding: 0 24px 60px;
-    animation: fadeUp 0.8s ease 0.4s both;
-  }
-
-  .stats {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    border-radius: 16px;
-    padding: 28px 0;
-  }
-
-  .stat {
-    text-align: center;
-    flex: 1;
-    position: relative;
-  }
-
-  .stat:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1px;
-    height: 40px;
-    background: var(--dark-border);
-  }
-
-  .stat-num {
-    font-family: var(--font-display);
-    font-size: 40px;
-    font-weight: 700;
-    color: var(--orange);
-    line-height: 1;
-  }
-
-  .stat-label {
-    font-size: 13px;
-    color: var(--gray);
-    margin-top: 6px;
-  }
-
-
-  /* --- SECTION --- */
-  section {
-    padding: 80px 24px;
-    max-width: 640px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  .section-label {
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    color: var(--orange);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-label::before {
-    content: '';
-    width: 20px;
-    height: 2px;
-    background: var(--orange);
-    flex-shrink: 0;
-  }
-
-  h2 {
-    font-family: var(--font-display);
-    font-size: clamp(28px, 6vw, 40px);
-    font-weight: 700;
-    line-height: 1.15;
-    margin-bottom: 24px;
-  }
-
-  h2 em {
-    color: var(--orange);
-    font-style: normal;
-  }
-
-  .text {
-    color: var(--light-gray);
-    font-size: 16px;
-    line-height: 1.8;
-    margin-bottom: 20px;
-  }
-
-  /* Section radial decoration */
-  .section-glow {
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(255,135,20,0.03) 0%, transparent 70%);
-    pointer-events: none;
-    top: 50%;
-    left: -100px;
-    transform: translateY(-50%);
-  }
-
-  /* --- HOW IT WORKS --- */
-  .steps {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    margin-top: 40px;
-  }
-
-  .steps-timeline {
-    position: relative;
-  }
-
-  .steps-timeline::before {
-    content: '';
-    position: absolute;
-    right: 41px;
-    top: 24px;
-    bottom: 24px;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--orange) 0%, var(--dark-border) 100%);
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .step {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    border-radius: 16px;
-    padding: 24px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .step-num {
-    font-family: var(--font-display);
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--orange);
-    line-height: 1;
-    flex-shrink: 0;
-    width: 36px;
-  }
-
-  .step-content h3 {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .step-content p {
-    font-size: 14px;
-    color: var(--gray);
-    line-height: 1.6;
-  }
-
-  /* --- COACH PREVIEW — PHONE MOCKUP --- */
-  .phone-mockup {
-    max-width: 380px;
-    margin: 40px auto 0;
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    border-radius: 32px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .phone-notch {
-    width: 120px;
-    height: 24px;
-    background: var(--dark);
-    border-radius: 0 0 16px 16px;
-    margin: 0 auto;
-  }
-
-  .phone-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-bottom: 1px solid var(--dark-border);
-  }
-
-  .phone-header-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--green);
-    border-radius: 50%;
-  }
-
-  .phone-header-title {
-    font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 700;
-  }
-
-  .phone-body {
-    padding: 20px;
-    min-height: 280px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .phone-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .coach-msg {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    align-items: flex-start;
-    opacity: 0;
-    transform: translateY(12px);
-    transition: all 0.5s var(--transition-smooth);
-  }
-
-  .coach-msg.msg-visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .coach-avatar {
-    width: 36px;
-    height: 36px;
-    background: var(--orange);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  .coach-bubble {
-    background: #1E1E26;
-    border-radius: 14px 14px 4px 14px;
-    padding: 14px 18px;
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--light-gray);
-    max-width: 85%;
-  }
-
-  .typing-indicator {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    opacity: 0;
-    transition: opacity 0.4s var(--transition-smooth);
-  }
-
-  .typing-indicator.msg-visible {
-    opacity: 1;
-  }
-
-  .typing-dots {
-    background: #1E1E26;
-    border-radius: 14px 14px 4px 14px;
-    padding: 14px 18px;
-    display: flex;
-    gap: 4px;
-    align-items: center;
-  }
-
-  .typing-dots span {
-    width: 6px;
-    height: 6px;
-    background: var(--gray);
-    border-radius: 50%;
-    animation: typingBounce 1.4s ease-in-out infinite;
-  }
-
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-  /* --- GOALS --- */
-
-  /* --- FAQ --- */
-  .faq-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 32px;
-  }
-
-  .faq-item {
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    border-radius: 14px;
-    overflow: hidden;
-    transition: border-color 0.3s var(--transition-smooth);
-  }
-
-  .faq-item.open {
-    border-color: rgba(255, 135, 20, 0.3);
-  }
-
-  .faq-question {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px;
-    cursor: pointer;
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 700;
-    background: none;
-    border: none;
-    color: var(--white);
-    width: 100%;
-    text-align: right;
-    gap: 16px;
-  }
-
-  .faq-icon {
-    font-size: 20px;
-    color: var(--orange);
-    transition: transform 0.3s var(--transition-smooth);
-    flex-shrink: 0;
-    line-height: 1;
-  }
-
-  .faq-item.open .faq-icon {
-    transform: rotate(45deg);
-  }
-
-  .faq-answer {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s var(--transition-smooth);
-  }
-
-  .faq-answer-inner {
-    padding: 0 24px 20px;
-    font-size: 14px;
-    color: var(--gray);
-    line-height: 1.8;
-  }
-
-  /* --- FORM --- */
-  .form-section {
-    background: linear-gradient(180deg, var(--dark) 0%, #0F0F16 100%);
-    padding: 80px 24px 100px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .form-glow {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255,135,20,0.06) 0%, transparent 70%);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-
-  .form-wrapper {
-    max-width: 480px;
-    margin: 0 auto;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .form-wrapper h2 {
-    margin-bottom: 8px;
-  }
-
-  .form-wrapper .text {
-    margin-bottom: 24px;
-  }
-
-  .spots-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.2);
-    color: var(--green);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 100px;
-    margin-bottom: 32px;
-  }
-
-  .spots-badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: pulse 2s ease infinite;
-  }
-
-  .form-card {
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    border-radius: 20px;
-    padding: 32px 28px;
-  }
-
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    text-align: right;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .form-group label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--light-gray);
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    background: var(--dark-surface);
-    border: 1px solid var(--dark-border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    font-family: var(--font-body);
-    font-size: 16px;
-    color: var(--white);
-    outline: none;
-    transition: border-color 0.2s ease;
-    -webkit-appearance: none;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    border-color: var(--orange);
-  }
-
-  .form-group input:valid:not(:placeholder-shown) {
-    border-color: rgba(34, 197, 94, 0.4);
-  }
-
-  .form-group input:invalid:not(:placeholder-shown):not(:focus) {
-    border-color: rgba(239, 68, 68, 0.4);
-  }
-
-  .form-group select {
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%238E8E9A'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: 16px center;
-    padding-left: 36px;
-  }
-
-  .form-group select option {
-    background: var(--dark-card);
-    color: var(--white);
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .submit-btn {
-    background: var(--orange);
-    color: var(--dark);
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 700;
-    padding: 16px;
-    border-radius: 14px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s var(--transition-smooth);
-    margin-top: 8px;
-  }
-
-  .submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px var(--orange-glow);
-  }
-
-  .submit-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  .form-note {
-    font-size: 12px;
-    color: var(--gray);
-    text-align: center;
-    margin-top: 8px;
-  }
-
-  /* Success state */
-  .success-msg {
-    display: none;
-    text-align: center;
-    padding: 40px 0;
-  }
-
-  .success-msg.show {
-    display: block;
-  }
-
-  .success-emoji {
-    font-size: 64px;
-    margin-bottom: 16px;
-  }
-
-  .success-msg h3 {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .success-msg p {
-    color: var(--gray);
-    font-size: 15px;
-    line-height: 1.7;
-  }
-
-  /* --- FOOTER --- */
-  footer {
-    text-align: center;
-    padding: 48px 24px 40px;
-    border-top: 1px solid var(--dark-border);
-  }
-
-  .footer-logo {
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-
-  .footer-logo span { color: var(--orange); }
-
-  .footer-tagline {
-    font-size: 14px;
-    color: var(--light-gray);
-    margin-bottom: 20px;
-  }
-
-  .footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
-  .footer-links a {
-    font-size: 13px;
-    color: var(--gray);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .footer-links a:hover {
-    color: var(--orange);
-  }
-
-  footer .footer-copy {
-    font-size: 13px;
-    color: var(--gray);
-  }
-
-  /* --- BACK TO TOP --- */
-  .back-to-top {
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
-    width: 44px;
-    height: 44px;
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: var(--light-gray);
-    cursor: pointer;
-    z-index: 100;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.3s var(--transition-smooth);
-    text-decoration: none;
-  }
-
-  .back-to-top.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .back-to-top:hover {
-    border-color: var(--orange);
-    color: var(--orange);
-  }
-
-  /* --- ANIMATIONS --- */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(6px); }
-  }
-
-  @keyframes shimmerText {
-    0%, 100% { background-position: 0% center; }
-    50% { background-position: 200% center; }
-  }
-
-  @keyframes badgeSweep {
-    0%, 100% { left: -100%; }
-    50% { left: 100%; }
-  }
-
-  @keyframes floatShape {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(15px, -20px) rotate(5deg); }
-    66% { transform: translate(-10px, 10px) rotate(-3deg); }
-  }
-
-
-  @keyframes typingBounce {
-    0%, 60%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-4px); }
-  }
-
-  /* --- REVEAL SYSTEM --- */
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s var(--transition-smooth);
-  }
-
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .reveal-left {
-    opacity: 0;
-    transform: translateX(30px);
-    transition: all 0.6s var(--transition-smooth);
-  }
-
-  .reveal-left.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .reveal-scale {
-    opacity: 0;
-    transform: scale(0.95);
-    transition: all 0.6s var(--transition-smooth);
-  }
-
-  .reveal-scale.visible {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* Step reveal (used in steps that aren't in timeline) */
-  .step {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
-  }
-
-  .step.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* --- SCROLL-DRIVEN ANIMATIONS (Progressive Enhancement) --- */
-  @supports (animation-timeline: scroll()) {
-    .hero-glow {
-      animation: parallaxGlow linear;
-      animation-timeline: scroll();
-      animation-range: 0 40vh;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>5ED — תוכנית אימון אישית | חמש אצבעות</title>
+  <meta name="description"
+    content="מימוש פוטנציאל כמו שעוד לא הכרתם. טכנולוגיית AI שמנתחת ביצועים ובונה תוכנית אימון אישית לכל מתאמן.">
+
+  <!-- OG for WhatsApp sharing -->
+  <meta property="og:title" content="5ED — תוכנית אימון אישית | חמש אצבעות">
+  <meta property="og:description" content="מאמן AI שבונה לך תוכנית אימון אישית. 30 יום. שיפור אמיתי.">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #09090B;
+      --fg: #FAFAFA;
+      --accent: #FF8714;
+      --muted: #27272A;
+      --border: #3F3F46;
+      --muted-fg: #A1A1AA;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Heebo', sans-serif;
+      --t-fast: 200ms ease;
+      --t-base: 300ms ease;
+      --border-w: 2px;
     }
 
-    @keyframes parallaxGlow {
-      from { transform: translateX(-50%) translateY(0); }
-      to { transform: translateX(-50%) translateY(60px); }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      border-radius: 0;
     }
-  }
 
-  /* --- RESPONSIVE: TABLET --- */
-  @media (max-width: 768px) {
-    .hero-shape:nth-child(2) { right: 5%; }
-    .hero-shape:nth-child(4) { left: 5%; }
-    .phone-mockup { max-width: 340px; }
-.form-card { padding: 28px 20px; }
-  }
-
-  /* --- RESPONSIVE: MOBILE --- */
-  @media (max-width: 480px) {
-    .stats { flex-direction: row; }
-    .stat-num { font-size: 32px; }
-    .form-row { grid-template-columns: 1fr; }
-    section { padding: 60px 20px; }
-    .coach-bubble { max-width: 92%; }
-    .phone-mockup { max-width: 100%; border-radius: 24px; }
-    .phone-notch { width: 100px; height: 20px; }
-    .steps-timeline::before { right: 37px; }
-.faq-question { font-size: 15px; padding: 18px 20px; }
-    .faq-answer-inner { padding: 0 20px 18px; }
-    .form-card { padding: 24px 16px; }
-    .footer-links { gap: 16px; }
-    .sticky-nav { padding: 8px 10px 8px 18px; gap: 12px; }
-    .sticky-nav-logo { font-size: 14px; }
-    .sticky-nav-cta { font-size: 12px; padding: 6px 16px; }
-  }
-</style>
-</head>
-<body>
-
-<!-- STICKY NAV -->
-<nav class="sticky-nav" id="stickyNav">
-  <div class="sticky-nav-logo">5<span>ED</span> × חמש אצבעות</div>
-  <a href="#register" class="sticky-nav-cta">הירשמו עכשיו</a>
-</nav>
-
-<!-- BACK TO TOP -->
-<a href="#" class="back-to-top" id="backToTop" aria-label="חזרה למעלה">↑</a>
-
-<!-- HERO -->
-<div class="hero" id="heroSection">
-  <div class="hero-glow"></div>
-  <div class="hero-shape"></div>
-  <div class="hero-shape"></div>
-  <div class="hero-shape"></div>
-  <div class="badge">פיילוט חמש אצבעות — מקומות מוגבלים</div>
-  <h1>מימוש פוטנציאל<span>כמו שעוד לא הכרתם</span></h1>
-  <p class="hero-sub"> בואו לקחת חלק בפיילוט ראשוני של אפליקציית חמש אצבעות ולהיות הראשונים שמשתמשים בבינה מלאכותית כדי לשפר כושר ותוצאות. ולהשפיע על עתיד החינוך והכושר בישראל</p>
-  <a href="#register" class="cta-btn">רוצה להיות ראשון/ה </a>
-  <div class="scroll-hint">↓ גלול למטה</div>
-</div>
-
-<!-- STATS -->
-<div class="stats-wrapper" id="statsSection">
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-num" data-count="30">0</div>
-      <div class="stat-label">ימי תוכנית</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">AI</div>
-      <div class="stat-label">מאמן אישי</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" data-count="0" data-suffix="₪">0₪</div>
-      <div class="stat-label">חינם לפיילוט</div>
-    </div>
-  </div>
-</div>
-
-
-<!-- WHAT IS THIS -->
-<section>
-  <div class="section-glow"></div>
-  <div class="reveal">
-    <div class="section-label">מה זה?</div>
-    <h2>לא עוד אפליקציית כושר.<br><em>דרך חדשה להגיע לפוטנציאל שלך</em></h2>
-    <p class="text">
-      אנחנו בונים משהו חדש בחמש אצבעות , מאמן AI שמכיר אותך, יודע מה המטרה שלך, ובונה לך תוכנית אימון אישית שמשתפרת כל שבוע.
-    </p>
-    <p class="text">
-     האפליקציה תלווה אותך בכל יום במקביל לאימונים בחמש אצבעות ותשפר אותך 24/7. כל יום 1% יותר, אנחנו מאמנים שככה מגיעים לתוצאות הטובות ביותר
-    </p>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section>
-  <div class="reveal">
-    <div class="section-label">איך זה עובד</div>
-    <h2>4 צעדים.<br><em>מהרשמה לשיאים.</em></h2>
-  </div>
-
-  <div class="steps steps-timeline">
-    <div class="step" data-delay="0">
-      <div class="step-num">01</div>
-      <div class="step-content">
-        <h3>בוחרים מטרה</h3>
-        <p>רוצה לרוץ יותר מהר? להיות יותר חזק? להגיע מוכן לצבא? המאמן AI מתחיל מהמטרה שלך.</p>
-      </div>
-    </div>
-    <div class="step" data-delay="100">
-      <div class="step-num">02</div>
-      <div class="step-content">
-        <h3>בדיקת רמה</h3>
-        <p>מבחן קצר (3 דקות) — כמה שכיבות, כמה ריצה, כמה פלאנק. ככה המאמן יודע מאיפה מתחילים.</p>
-      </div>
-    </div>
-    <div class="step" data-delay="200">
-      <div class="step-num">03</div>
-      <div class="step-content">
-        <h3>התוכנית נבנית</h3>
-        <p>המאמן AI בונה לך 30 יום של אימונים — מותאמים למטרה, לרמה, ולימים שלך. כל שבוע קשה יותר.</p>
-      </div>
-    </div>
-    <div class="step" data-delay="300">
-      <div class="step-num">04</div>
-      <div class="step-content">
-        <h3>מתאמנים ושוברים שיאים</h3>
-        <p>כל יום פותחים את האפליקציה → מקבלים את האימון → עושים → רואים שיפור. 30 יום — before ו-after.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- AI COACH PREVIEW -->
-<section>
-  <div class="reveal">
-    <div class="section-label">המאמן AI</div>
-    <h2>לא צ'אטבוט.<br><em>מאמן מאמן מקצועי שמכיר אותך.</em></h2>
-    <p class="text">
-      ה-AI שלנו נבנה ביחד עם המחלקה המקצועית ומבוסס על עקרונות האימון של חמש אצבעות. בנוסף הוא גם לומד אותך ומעצב את התוכנית תוך כדי תנועה כדי למקסם את התוצאות שלך
-    </p>
-  </div>
-
-  <div class="phone-mockup reveal-scale" id="coachPhone">
-    <div class="phone-notch"></div>
-    <div class="phone-header">
-      <div class="phone-header-dot"></div>
-      <div class="phone-header-title">המאמן שלך</div>
-    </div>
-    <div class="phone-body">
-      <div class="coach-msg" data-msg="1">
-        <div class="coach-avatar">🔥</div>
-        <div class="coach-bubble">
-          6 אינטרוולים. סיימת. 💪<br><br>
-          שבוע שעבר באינטרוול 5 רצית לעצור. היום עברת את ה-5 בלי לחשוב.<br><br>
-          <strong>הפער שלך גדל.</strong> זה לא רק כושר — זה הראש שלך שהשתנה.
-        </div>
-      </div>
-      <div class="coach-msg" data-msg="2">
-        <div class="coach-avatar">🔥</div>
-        <div class="coach-bubble">
-          שאלה אחת לפני שסוגר: באינטרוול האחרון, כשהיה הכי קשה — מה אמרת לעצמך?
-        </div>
-      </div>
-      <div class="typing-indicator" data-msg="3">
-        <div class="coach-avatar">🔥</div>
-        <div class="typing-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- WHAT YOU GET -->
-<section>
-  <div class="reveal">
-    <div class="section-label">מה כולל הפיילוט</div>
-    <h2>30 יום של<br><em>שיפור אמיתי</em></h2>
-  </div>
-
-  <div class="steps">
-    <div class="step" data-delay="0">
-      <div class="step-num">📱</div>
-      <div class="step-content">
-        <h3>גישה בלעדית לממשק חדש לגמרי באפליקציה וכלי AI</h3>
-        <p>תהיו הראשונים לנסות את הטכנולוגיה החדשה — ממשק מתקדם עם מאמן AI אישי שבונה לכם תוכנית אימון מותאמת.</p>
-      </div>
-    </div>
-    <div class="step" data-delay="100">
-      <div class="step-num">🤝</div>
-      <div class="step-content">
-        <h3>השתתפות ב-3 מפגשי פיילוט מצומצמים</h3>
-        <p>מפגשים עם צוות האפליקציה וכל משתתפי הפיילוט — לשתף חוויות, לתת פידבק, ולהיות חלק מהסיפור.</p>
-      </div>
-    </div>
-    <div class="step" data-delay="200">
-      <div class="step-num">💬</div>
-      <div class="step-content">
-        <h3>תקשורת רציפה והשפעה ישירה</h3>
-        <p>קו פתוח לצוות הפיתוח. הדעה שלכם משנה — תשפיעו ישירות על עתיד האפליקציה.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section>
-  <div class="reveal">
-    <div class="section-label">שאלות נפוצות</div>
-    <h2>יש שאלות?<br><em>יש תשובות.</em></h2>
-  </div>
-
-  <div class="faq-list reveal">
-    <div class="faq-item">
-      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-        <span>זה באמת בחינם?</span>
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-answer">
-        <div class="faq-answer-inner">כן. הפיילוט הראשון הוא לגמרי בחינם. אנחנו בשלב בנייה ורוצים לבדוק את המערכת עם קבוצה קטנה. בתמורה — אתם מקבלים תוכנית אימון אישית, ואנחנו מקבלים פידבק שעוזר לנו להשתפר.</div>
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-        <span>צריך ציוד מיוחד?</span>
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-answer">
-        <div class="faq-answer-inner">לא. התוכנית מבוססת על אימוני משקל גוף — שכיבות, ריצה, פלאנק, ועוד. אפשר להתאמן בבית, בפארק, או בחצר. אם יש לך ציוד — המאמן ישלב אותו.</div>
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-        <span>כמה זמן כל אימון?</span>
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-answer">
-        <div class="faq-answer-inner">בין 20 ל-40 דקות, תלוי ביום ובסוג האימון. יש ימי ריצה קצרים ויש ימי כוח ארוכים יותר. הכל מותאם ללו״ז שלך.</div>
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-        <span>אין לי ניסיון באימונים — זה בסדר?</span>
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-answer">
-        <div class="faq-answer-inner">בהחלט. המאמן AI מתאים את התוכנית לרמה שלך. אם מתחילים מאפס — התוכנית תהיה מתאימה. אם כבר יש רמה — היא תהיה מאתגרת.</div>
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-        <span>צריך אישור הורים?</span>
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-answer">
-        <div class="faq-answer-inner">כן. הפיילוט מיועד לגילאי 12-17. נבקש אישור הורים לפני ההתחלה — ניצור קשר דרך ה-WhatsApp שתשאירו בטופס.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FORM -->
-<div class="form-section" id="register">
-  <div class="form-glow"></div>
-  <div class="form-wrapper">
-    <div class="reveal">
-      <div class="section-label">הרשמה לפיילוט</div>
-      <h2>רוצה להיות<br><em>ראשון/ה?</em></h2>
-      <p class="text">מקומות מוגבלים. 20-30 מתאמנים בלבד. השאירו פרטים ונחזור אליכם.</p>
-      <div class="spots-badge">נשארו 7 מקומות מתוך 15</div>
-    </div>
-
-    <div class="form-card reveal">
-      <form class="form" id="waitlistForm" onsubmit="handleSubmit(event)">
-        <div class="form-group">
-          <label for="name">שם מלא</label>
-          <input type="text" id="name" name="name" required placeholder="השם שלך">
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="age">גיל</label>
-            <select id="age" name="age" required>
-              <option value="" disabled selected>בחר/י</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="phone">טלפון (WhatsApp)</label>
-            <input type="tel" id="phone" name="phone" required placeholder="050-0000000" dir="ltr">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="goal">מה הכי חשוב לך להשיג?</label>
-          <select id="goal" name="goal" required>
-            <option value="" disabled selected>בחר/י מטרה</option>
-            <option value="running">לרוץ יותר מהר / יותר רחוק</option>
-            <option value="strength">להיות יותר חזק/ה</option>
-            <option value="sport">להשתפר בספורט</option>
-            <option value="army">להגיע מוכן/ה לצבא</option>
-            <option value="other">אחר</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="freetext">עוד משהו שחשוב לך שנדע? (אופציונלי)</label>
-          <textarea id="freetext" name="freetext" placeholder="למשל: באיזה ספורט אתה משחק, כמה פעמים בשבוע אתה מתאמן..."></textarea>
-        </div>
-
-        <button type="submit" class="submit-btn" id="submitBtn">הירשמו לרשימת ההמתנה ✋</button>
-        <div class="form-note">המקומות באמת מוגבלים. 10-15 מתאמנים בלבד. חינם.</div>
-      </form>
-    </div>
-
-    <div class="success-msg" id="successMsg">
-      <div class="success-emoji">✋</div>
-      <h3>נרשמת!</h3>
-      <p>קיבלנו את הפרטים. ניצור איתך קשר ב-WhatsApp עם כל הפרטים על הפיילוט. תתכוננו — זה הולך להיות 30 יום רציניים. 🔥</p>
-    </div>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">5<span>ED</span> × חמש אצבעות</div>
-  <p class="footer-tagline">מאמן AI שבונה לך תוכנית אימון אישית</p>
-  <div class="footer-links">
-    <a href="#register">הרשמה לפיילוט</a>
-    <a href="https://wa.me/972500000000" target="_blank" rel="noopener">WhatsApp</a>
-    <a href="mailto:info@5ed.co.il">יצירת קשר</a>
-  </div>
-  <p class="footer-copy">פיילוט תוכנית אימון אישית | 2026</p>
-</footer>
-
-<script>
-// --- REVEAL ON SCROLL (with data-delay support) ---
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const delay = parseInt(entry.target.dataset.delay) || 0;
-      setTimeout(() => {
-        entry.target.classList.add('visible');
-      }, delay);
-      revealObserver.unobserve(entry.target);
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
-  });
-}, { threshold: 0.15 });
 
-document.querySelectorAll('.reveal, .reveal-left, .reveal-scale, .step').forEach(el => {
-  revealObserver.observe(el);
-});
-
-// --- STICKY NAV (IntersectionObserver) ---
-const stickyNav = document.getElementById('stickyNav');
-const heroSection = document.getElementById('heroSection');
-
-const navObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      stickyNav.classList.remove('visible');
-    } else {
-      stickyNav.classList.add('visible');
+    /* --- GRAIN OVERLAY --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: overlay;
     }
-  });
-}, { threshold: 0.1 });
 
-navObserver.observe(heroSection);
-
-// --- BACK TO TOP ---
-const backToTop = document.getElementById('backToTop');
-const statsSection = document.getElementById('statsSection');
-
-const backTopObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      backToTop.classList.remove('visible');
-    } else {
-      backToTop.classList.add('visible');
+    /* --- STICKY NAV --- */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 64px;
+      background: var(--bg);
+      border-bottom: var(--border-w) solid transparent;
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s ease, border-color 0.3s ease;
     }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -100% 0px' });
 
-backTopObserver.observe(statsSection);
+    .site-nav.nav--scrolled {
+      transform: translateY(0);
+      opacity: 1;
+      border-bottom-color: var(--border);
+    }
 
-// --- COUNT-UP ANIMATION ---
-const countElements = document.querySelectorAll('[data-count]');
-const countObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const el = entry.target;
-      const target = parseInt(el.dataset.count);
-      const suffix = el.dataset.suffix || '';
-      const duration = 1200;
-      const start = performance.now();
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
 
-      function update(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.round(target * eased);
-        el.textContent = current + suffix;
-        if (progress < 1) requestAnimationFrame(update);
+    .nav-badge {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--muted-fg);
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+    }
+
+    .nav-cta {
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0 20px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--t-fast), color var(--t-fast);
+      height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-cta:hover {
+      background: var(--fg);
+    }
+
+    /* --- HERO --- */
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 80px 40px 64px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: var(--border-w) solid var(--border);
+    }
+
+    .hero-bg-num {
+      position: absolute;
+      top: 50%;
+      left: -2vw;
+      transform: translateY(-50%);
+      font-family: var(--font-display);
+      font-size: clamp(15rem, 40vw, 32rem);
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.06em;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-family: var(--font-body);
+      font-weight: 900;
+      font-size: clamp(2.5rem, 15vw, 11rem);
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      margin-bottom: 0;
+    }
+
+    .h1-outline {
+      -webkit-text-stroke: 2px var(--accent);
+      color: transparent;
+      display: block;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      color: var(--muted-fg);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-top: 28px;
+      margin-bottom: 36px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0 36px;
+      border: var(--border-w) solid var(--accent);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+      display: inline-flex;
+      align-items: center;
+      height: 52px;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      background: var(--fg);
+      border-color: var(--fg);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--fg);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0 36px;
+      border: var(--border-w) solid var(--border);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+      display: inline-flex;
+      align-items: center;
+      height: 52px;
+      white-space: nowrap;
+    }
+
+    .btn-outline:hover {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
+    }
+
+    /* Hero stat strip */
+    .hero-stats {
+      display: flex;
+      border: var(--border-w) solid var(--border);
+      max-width: 440px;
+      overflow: hidden;
+    }
+
+    .hero-stat {
+      flex: 1;
+      padding: 18px 16px;
+      border-inline-end: var(--border-w) solid var(--border);
+      text-align: center;
+    }
+
+    .hero-stat:last-child {
+      border-inline-end: none;
+    }
+
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      display: block;
+    }
+
+    .hero-stat-label {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--muted-fg);
+      text-transform: uppercase;
+      margin-top: 4px;
+      display: block;
+    }
+
+
+    /* --- SECTION LAYOUT --- */
+    .section {
+      padding: 96px 40px;
+      border-bottom: var(--border-w) solid var(--border);
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-family: var(--font-body);
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    h2 em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .text {
+      color: var(--muted-fg);
+      font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+      line-height: 1.8;
+      margin-bottom: 20px;
+      max-width: 640px;
+    }
+
+    /* --- ABOUT SECTION --- */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .about-copy {
+      position: relative;
+    }
+
+
+    .about-copy-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Card inversion pattern */
+    .stat-cards {
+      display: flex;
+      flex-direction: column;
+      border: var(--border-w) solid var(--border);
+      overflow: hidden;
+    }
+
+    .stat-card {
+      --c-num: var(--accent);
+      --c-sub: var(--muted-fg);
+      --c-bg: transparent;
+      background: var(--c-bg);
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+      transition: background var(--t-base);
+      cursor: default;
+    }
+
+    .stat-card:last-child {
+      border-bottom: none;
+    }
+
+    .stat-card:hover {
+      --c-num: var(--bg);
+      --c-sub: var(--bg);
+      --c-bg: var(--accent);
+    }
+
+    .stat-card__num {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 4.5vw, 3.75rem);
+      font-weight: 700;
+      line-height: 1;
+      color: var(--c-num);
+      transition: color var(--t-base);
+    }
+
+    .stat-card__label {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c-sub);
+      margin-top: 6px;
+      transition: color var(--t-base);
+    }
+
+    /* --- HOW IT WORKS --- */
+    .steps-container {
+      border: var(--border-w) solid var(--border);
+      overflow: hidden;
+      margin-top: 40px;
+    }
+
+    .step-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      align-items: start;
+      border-bottom: 1px solid var(--border);
+      padding: 32px 40px;
+      gap: 32px;
+      transition: background var(--t-base);
+      cursor: default;
+      /* reveal animation */
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .step-row.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.5s ease, transform 0.5s ease, background var(--t-base);
+    }
+
+    .step-row:last-child {
+      border-bottom: none;
+    }
+
+    .step-row:hover {
+      background: var(--muted);
+    }
+
+    .step-num {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 700;
+      color: var(--border);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      transition: color var(--t-base);
+      padding-top: 4px;
+    }
+
+    .step-row:hover .step-num {
+      color: var(--accent);
+    }
+
+    .step-tag {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .step-content h3 {
+      font-family: var(--font-body);
+      font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+      font-weight: 900;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+
+    .step-content p {
+      font-size: 14px;
+      color: var(--muted-fg);
+      line-height: 1.7;
+    }
+
+    /* --- AI COACH --- */
+    .coach-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      border: var(--border-w) solid var(--border);
+      overflow: hidden;
+      margin-top: 40px;
+    }
+
+    .coach-meta {
+      border-inline-end: var(--border-w) solid var(--border);
+      padding: 36px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .coach-meta-dec {
+      position: absolute;
+      bottom: -10px;
+      right: 16px;
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 9vw, 7rem);
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.04em;
+    }
+
+    .coach-meta-items {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .coach-meta-item {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+
+    .coach-meta-item:first-child {
+      padding-top: 0;
+    }
+
+    .coach-meta-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .coach-meta-key {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-bottom: 6px;
+    }
+
+    .coach-meta-val {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+      flex-shrink: 0;
+    }
+
+    .coach-chat {
+      padding: 32px;
+      min-height: 360px;
+    }
+
+    .coach-msg {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.5s ease;
+    }
+
+    .coach-msg.msg-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .coach-avatar {
+      width: 34px;
+      height: 34px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--bg);
+      flex-shrink: 0;
+      font-family: var(--font-display);
+    }
+
+    .coach-bubble {
+      background: var(--muted);
+      border: var(--border-w) solid var(--border);
+      border-inline-start: 4px solid var(--accent);
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--fg);
+      max-width: 85%;
+    }
+
+    .typing-indicator {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .typing-indicator.msg-visible {
+      opacity: 1;
+    }
+
+    .typing-dots {
+      background: var(--muted);
+      border: var(--border-w) solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--muted-fg);
+      border-radius: 50%;
+      animation: typingBounce 1.4s ease-in-out infinite;
+    }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* Plan display inside coach */
+    .plan-generating {
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.4s ease;
+    }
+
+    .plan-generating.plan-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .plan-ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: var(--border-w) solid var(--border);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 14px;
+      font-family: var(--font-display);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .plan-ai-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1.5s ease infinite;
+      flex-shrink: 0;
+    }
+
+    .plan-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.4s ease;
+    }
+
+    .plan-title-row.plan-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .plan-week-label {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .plan-badge {
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .plan-day {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      padding: 12px 16px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.45s ease;
+    }
+
+    .plan-day:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plan-day.plan-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .plan-day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .plan-day-name {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--fg);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .plan-day-type {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 8px;
+      font-family: var(--font-display);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .plan-day-type.run {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .plan-day-type.strength {
+      background: transparent;
+      color: #A78BFA;
+      border: 1px solid #A78BFA;
+    }
+
+    .plan-day-type.cardio {
+      background: transparent;
+      color: #22C55E;
+      border: 1px solid #22C55E;
+    }
+
+    .plan-exercises {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .plan-exercises li {
+      font-size: 12px;
+      color: var(--muted-fg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.4;
+    }
+
+    .plan-exercises li::before {
+      content: '→';
+      color: var(--accent);
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+
+    /* --- FEATURES --- */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: var(--border-w) solid var(--border);
+      overflow: hidden;
+      margin-top: 40px;
+    }
+
+    .feature-card {
+      --c-num: var(--border);
+      --c-title: var(--fg);
+      --c-body: var(--muted-fg);
+      --c-bg: transparent;
+      background: var(--c-bg);
+      padding: 36px 28px;
+      border-inline-end: 1px solid var(--border);
+      transition: background var(--t-base);
+      cursor: default;
+    }
+
+    .feature-card:last-child {
+      border-inline-end: none;
+    }
+
+    .feature-card:hover {
+      --c-num: var(--bg);
+      --c-title: var(--bg);
+      --c-body: var(--bg);
+      --c-bg: var(--accent);
+    }
+
+    .feature-card__num {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 700;
+      color: var(--c-num);
+      line-height: 1;
+      margin-bottom: 20px;
+      transition: color var(--t-base);
+      letter-spacing: -0.04em;
+    }
+
+    .feature-card__title {
+      font-family: var(--font-body);
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--c-title);
+      margin-bottom: 10px;
+      transition: color var(--t-base);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-card__body {
+      font-size: 14px;
+      color: var(--c-body);
+      line-height: 1.7;
+      transition: color var(--t-base);
+    }
+
+    /* --- FAQ --- */
+    .faq-container {
+      border: var(--border-w) solid var(--border);
+      overflow: hidden;
+      margin-top: 40px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 32px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 700;
+      background: none;
+      border: none;
+      color: var(--fg);
+      width: 100%;
+      text-align: right;
+      gap: 16px;
+      transition: background var(--t-fast);
+    }
+
+    .faq-question:hover {
+      background: var(--muted);
+    }
+
+    .faq-icon {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--accent);
+      flex-shrink: 0;
+      line-height: 1;
+      transition: transform 0.3s ease;
+      display: block;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .faq-answer-inner {
+      padding: 0 32px 22px;
+      font-size: 15px;
+      color: var(--muted-fg);
+      line-height: 1.8;
+    }
+
+    /* --- FORM SECTION --- */
+    .form-section {
+      padding: 96px 40px;
+      border-bottom: var(--border-w) solid var(--border);
+    }
+
+    .form-section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+
+    .form-headline h2 {
+      font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+      margin-bottom: 16px;
+    }
+
+    .form-dec-word {
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 9vw, 7.5rem);
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      display: block;
+      margin-top: 16px;
+      user-select: none;
+    }
+
+    .spots-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      color: var(--muted-fg);
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      margin-top: 20px;
+    }
+
+    .spots-dot {
+      width: 6px;
+      height: 6px;
+      background: #22C55E;
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+      flex-shrink: 0;
+    }
+
+    /* Form as bordered container */
+    .form-card {
+      border: var(--border-w) solid var(--border);
+      overflow: hidden;
+    }
+
+    .form-field {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--t-fast);
+    }
+
+    .form-field:focus-within {
+      background: var(--muted);
+    }
+
+    .form-field label {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      padding: 14px 24px 2px;
+      transition: color var(--t-fast);
+    }
+
+    .form-field:focus-within label {
+      color: var(--accent);
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--font-body);
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-weight: 700;
+      color: var(--fg);
+      padding: 2px 24px 14px;
+      line-height: 1.3;
+      -webkit-appearance: none;
+    }
+
+    .form-field input::placeholder,
+    .form-field textarea::placeholder {
+      color: var(--border);
+    }
+
+    .form-field select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%23A1A1AA'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 24px center;
+    }
+
+    .form-field select option {
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 16px;
+    }
+
+    .form-field textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .form-row-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-row-fields .form-field {
+      border-bottom: none;
+      border-inline-end: 1px solid var(--border);
+    }
+
+    .form-row-fields .form-field:last-child {
+      border-inline-end: none;
+    }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 20px;
+      border: none;
+      cursor: pointer;
+      transition: background var(--t-fast), color var(--t-fast);
+    }
+
+    .submit-btn:hover {
+      background: var(--fg);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Success state */
+    .success-msg {
+      display: none;
+      border: var(--border-w) solid var(--accent);
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .success-msg.show {
+      display: block;
+    }
+
+    .success-check {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .success-msg h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .success-msg p {
+      color: var(--muted-fg);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      padding: 32px 40px;
+      border-top: var(--border-w) solid var(--border);
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      text-decoration: none;
+      transition: color var(--t-fast);
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .footer-copy {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--muted-fg);
+      text-transform: uppercase;
+    }
+
+    .back-to-top-link {
+      background: transparent;
+      border: var(--border-w) solid var(--border);
+      color: var(--fg);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0 20px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+      height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .back-to-top-link:hover {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
+    }
+
+    /* Fixed back-to-top (kept for JS) */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      width: 44px;
+      height: 44px;
+      background: var(--muted);
+      border: var(--border-w) solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--muted-fg);
+      cursor: pointer;
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity var(--t-base), transform var(--t-base), border-color var(--t-fast), color var(--t-fast);
+      text-decoration: none;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .back-to-top:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* --- ANIMATIONS --- */
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
       }
 
-      requestAnimationFrame(update);
-      countObserver.unobserve(el);
+      50% {
+        opacity: 0.4;
+      }
     }
-  });
-}, { threshold: 0.5 });
 
-countElements.forEach(el => countObserver.observe(el));
+    @keyframes typingBounce {
 
-// --- COACH MESSAGES SEQUENTIAL ANIMATION ---
-const coachPhone = document.getElementById('coachPhone');
-const coachObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const messages = entry.target.querySelectorAll('[data-msg]');
-      messages.forEach((msg, i) => {
-        setTimeout(() => {
-          msg.classList.add('msg-visible');
-        }, 800 * (i + 1));
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+      }
+
+      30% {
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* --- REVEAL SYSTEM --- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.97);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal-scale.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* --- RESPONSIVE: TABLET --- */
+    @media (max-width: 900px) {
+      .coach-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .coach-meta {
+        border-inline-end: none;
+        border-bottom: var(--border-w) solid var(--border);
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+.features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-card {
+        border-inline-end: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .feature-card:last-child {
+        border-bottom: none;
+      }
+
+      .form-section-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+
+    /* --- RESPONSIVE: TABLET/SMALL --- */
+    @media (max-width: 640px) {
+      .section {
+        padding: 64px 24px;
+      }
+
+      .form-section {
+        padding: 64px 24px;
+      }
+    }
+
+    /* --- RESPONSIVE: MOBILE --- */
+    @media (max-width: 480px) {
+      .hero {
+        justify-content: flex-start;
+        padding: 80px 20px 40px;
+      }
+
+      .hero-bg-num {
+        opacity: 0.25;
+        font-size: 8rem;
+        left: -1rem;
+      }
+
+      .section {
+        padding: 48px 20px;
+      }
+
+      .section-header {
+        margin-bottom: 28px;
+      }
+
+      .nav-badge {
+        display: none;
+      }
+
+      .site-nav {
+        padding: 0 20px;
+      }
+
+      /* Hero typography */
+      h1 {
+        font-size: clamp(2.25rem, 11vw, 3.5rem);
+      }
+
+      .h1-outline {
+        -webkit-text-stroke: 1px var(--accent);
+      }
+
+      .hero-sub {
+        max-width: 100%;
+        font-size: 0.9rem;
+      }
+
+      /* Hero CTAs — stack full-width */
+      .hero-ctas {
+        flex-direction: column;
+      }
+
+      .hero-ctas .btn-primary,
+      .hero-ctas .btn-outline {
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* Hero stats */
+      .hero-stats {
+        flex-direction: column;
+        max-width: 100%;
+      }
+
+      .hero-stat {
+        border-inline-end: none;
+        border-bottom: var(--border-w) solid var(--border);
+      }
+
+      .hero-stat:last-child {
+        border-bottom: none;
+      }
+
+      /* Hide decorative elements */
+      .coach-meta-dec {
+        display: none;
+      }
+
+      .form-dec-word {
+        display: none;
+      }
+
+      /* Steps */
+      .step-row {
+        grid-template-columns: 60px 1fr;
+        padding: 24px 20px;
+        gap: 16px;
+      }
+
+      .step-num {
+        font-size: 2.25rem;
+      }
+
+      /* Form section */
+      .form-section {
+        padding: 48px 20px;
+      }
+
+      .form-row-fields {
+        grid-template-columns: 1fr;
+        border-bottom: none;
+      }
+
+      .form-row-fields .form-field {
+        border-inline-end: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* Feature cards */
+      .feature-card {
+        padding: 24px 20px;
+      }
+
+      /* Form touch targets */
+      .form-field label {
+        padding: 12px 16px 2px;
+      }
+
+      .form-field input,
+      .form-field select,
+      .form-field textarea {
+        padding: 4px 16px 12px;
+        min-height: 44px;
+      }
+
+      .form-field select {
+        background-position: 16px center;
+      }
+
+      /* Footer */
+      footer {
+        padding: 24px 20px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .faq-question {
+        padding: 18px 20px;
+        font-size: 15px;
+      }
+
+      .faq-answer-inner {
+        padding: 0 20px 18px;
+      }
+
+      .coach-meta {
+        padding: 24px 20px;
+      }
+
+      .coach-chat {
+        padding: 20px;
+      }
+
+      .success-msg {
+        padding: 36px 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- STICKY NAV -->
+  <nav class="site-nav" id="stickyNav">
+    <div class="nav-logo">5ED</div>
+    <div class="nav-badge">× חמש אצבעות</div>
+    <a href="#register" class="nav-cta">הירשמו עכשיו</a>
+  </nav>
+
+  <!-- BACK TO TOP (fixed, kept for JS) -->
+  <a href="#" class="back-to-top" id="backToTop" aria-label="חזרה למעלה">↑</a>
+
+  <!-- HERO -->
+  <div class="hero" id="heroSection">
+    <span class="hero-bg-num" aria-hidden="true">5</span>
+    <div class="hero-content">
+      <div class="hero-badge">אפליקציית חמש אצבעות</div>
+      <h1>
+        מימוש
+        <span class="h1-outline">פוטנציאל</span>
+      </h1>
+
+      <p class="hero-sub">
+        בואו לקחת חלק בפיילוט ראשוני של אפליקציית חמש אצבעות ולהיות הראשונים שמשתמשים בבינה מלאכותית כדי לשפר כושר
+        ותוצאות. ולהשפיע על עתיד החינוך והכושר בישראל
+      </p>
+
+      <div class="hero-ctas">
+        <a href="#register" class="btn-primary">רוצה להיות ראשון/ה</a>
+        <a href="#about" class="btn-outline">קרא עוד ↓</a>
+      </div>
+
+      <div class="hero-stats" id="statsSection">
+        <div class="hero-stat">
+          <span class="hero-stat-num" data-count="30">0</span>
+          <span class="hero-stat-label">ימי תוכנית</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">AI</span>
+          <span class="hero-stat-label">מאמן אישי</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" data-count="0" data-suffix="₪">0₪</span>
+          <span class="hero-stat-label">חינם לפיילוט</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ABOUT / WHAT IS THIS -->
+  <section class="section" id="about">
+    <div class="about-grid">
+      <div class="about-copy">
+<div class="about-copy-inner reveal">
+          <h2>לא עוד<br>אפליקציית כושר.<br><em>דרך חדשה.</em></h2>
+          <p class="text">
+            אנחנו בונים משהו חדש בחמש אצבעות — מאמן AI שמכיר אותך, יודע מה המטרה שלך, ובונה לך תוכנית אימון אישית
+            שמשתפרת כל שבוע.
+          </p>
+          <p class="text">
+            האפליקציה תלווה אותך בכל יום במקביל לאימונים בחמש אצבעות ותשפר אותך 24/7. כל יום 1% יותר, אנחנו מאמנים שככה
+            מגיעים לתוצאות הטובות ביותר
+          </p>
+        </div>
+      </div>
+
+      <div class="stat-cards reveal">
+        <div class="stat-card">
+          <div class="stat-card__num" data-count="30">0</div>
+          <div class="stat-card__label">ימי תוכנית</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__num">AI</div>
+          <div class="stat-card__label">מאמן אישי</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__num" data-count="0" data-suffix="₪">0₪</div>
+          <div class="stat-card__label">חינם לפיילוט</div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="reveal">
+        <h2>4 צעדים.<br><em>מהרשמה לשיאים.</em></h2>
+      </div>
+
+      <div class="steps-container">
+        <div class="step-row" data-delay="0">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <span class="step-tag">ONBOARDING</span>
+            <h3>בוחרים מטרה</h3>
+            <p>רוצה לרוץ יותר מהר? להיות יותר חזק? להגיע מוכן לצבא? המאמן AI מתחיל מהמטרה שלך.</p>
+          </div>
+        </div>
+        <div class="step-row" data-delay="100">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <span class="step-tag">ASSESS</span>
+            <h3>בדיקת רמה</h3>
+            <p>מבחן קצר (3 דקות) — כמה שכיבות, כמה ריצה, כמה פלאנק. ככה המאמן יודע מאיפה מתחילים.</p>
+          </div>
+        </div>
+        <div class="step-row" data-delay="200">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <span class="step-tag">PLAN</span>
+            <h3>התוכנית נבנית</h3>
+            <p>המאמן AI בונה לך 30 יום של אימונים — מותאמים למטרה, לרמה, ולימים שלך. כל שבוע קשה יותר.</p>
+          </div>
+        </div>
+        <div class="step-row" data-delay="300">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <span class="step-tag">TRAIN</span>
+            <h3>מתאמנים ושוברים שיאים</h3>
+            <p>כל יום פותחים את האפליקציה → מקבלים את האימון → עושים → רואים שיפור. 30 יום — before ו-after.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI COACH PREVIEW -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="reveal">
+        <h2>בונה לך תוכנית.<br><em>מותאמת אישית. כל שבוע.</em></h2>
+        <p class="text">
+          המאמן AI מנתח את המטרות שלך, הרמה, והלו״ז — ובונה תוכנית אימון שלמה ל-30 יום. כל שבוע מאתגר יותר מהקודם.
+        </p>
+      </div>
+
+      <div class="coach-grid reveal-scale" id="coachPhone">
+        <div class="coach-meta">
+          <span class="coach-meta-dec" aria-hidden="true">AI</span>
+          <div class="coach-meta-items">
+            <div class="coach-meta-item">
+              <div class="coach-meta-key">STATUS</div>
+              <div class="coach-meta-val">
+                <span class="status-dot"></span>
+                פעיל — בונה תוכנית
+              </div>
+            </div>
+            <div class="coach-meta-item">
+              <div class="coach-meta-key">RESPONSE TIME</div>
+              <div class="coach-meta-val">פחות מ-30 שניות</div>
+            </div>
+            <div class="coach-meta-item">
+              <div class="coach-meta-key">LANGUAGE</div>
+              <div class="coach-meta-val">עברית / English</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="coach-chat">
+          <div class="plan-generating" data-plan="gen">
+            <div class="plan-ai-badge">
+              <span class="plan-ai-dot"></span>
+              AI מנתח ובונה תוכנית...
+            </div>
+          </div>
+
+          <div class="plan-title-row" data-plan="title">
+            <span class="plan-week-label">שבוע 1 — ריצה וכוח</span>
+            <span class="plan-badge">30 יום</span>
+          </div>
+
+          <div class="plan-day" data-plan="day1">
+            <div class="plan-day-header">
+              <span class="plan-day-name">יום א׳</span>
+              <span class="plan-day-type run">ריצה</span>
+            </div>
+            <ul class="plan-exercises">
+              <li>חימום 5 דקות</li>
+              <li>אינטרוולים × 6</li>
+              <li>שחרור 3 דקות</li>
+            </ul>
+          </div>
+
+          <div class="plan-day" data-plan="day2">
+            <div class="plan-day-header">
+              <span class="plan-day-name">יום ג׳</span>
+              <span class="plan-day-type strength">כוח עליון</span>
+            </div>
+            <ul class="plan-exercises">
+              <li>שכיבות שמיכה 3×12</li>
+              <li>מתח 3×6</li>
+              <li>פלאנק 3×40 שניות</li>
+            </ul>
+          </div>
+
+          <div class="plan-day" data-plan="day3">
+            <div class="plan-day-header">
+              <span class="plan-day-name">יום ה׳</span>
+              <span class="plan-day-type cardio">סיבולת</span>
+            </div>
+            <ul class="plan-exercises">
+              <li>ריצה רציפה 20 דקות</li>
+              <li>ברפי 3×10</li>
+              <li>קפיצות 3×15</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES / WHAT YOU GET -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="reveal">
+        <h2>30 יום של<br><em>שיפור אמיתי</em></h2>
+      </div>
+
+      <div class="features-grid reveal">
+        <div class="feature-card">
+          <div class="feature-card__num">01</div>
+          <div class="feature-card__title">גישה בלעדית</div>
+          <div class="feature-card__body">תהיו הראשונים לנסות את הטכנולוגיה החדשה — ממשק מתקדם עם מאמן AI אישי שבונה לכם
+            תוכנית אימון מותאמת.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__num">02</div>
+          <div class="feature-card__title">מפגשי פיילוט</div>
+          <div class="feature-card__body">מפגשים עם צוות האפליקציה וכל משתתפי הפיילוט — לשתף חוויות, לתת פידבק, ולהיות
+            חלק מהסיפור.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__num">03</div>
+          <div class="feature-card__title">השפעה ישירה</div>
+          <div class="feature-card__body">קו פתוח לצוות הפיתוח. הדעה שלכם משנה — תשפיעו ישירות על עתיד האפליקציה.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="reveal">
+        <h2>יש שאלות?<br><em>יש תשובות.</em></h2>
+      </div>
+
+      <div class="faq-container reveal">
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+            <span>זה באמת בחינם?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">כן. הפיילוט הראשון הוא לגמרי בחינם. אנחנו בשלב בנייה ורוצים לבדוק את המערכת עם
+              קבוצה קטנה. בתמורה — אתם מקבלים תוכנית אימון אישית, ואנחנו מקבלים פידבק שעוזר לנו להשתפר.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+            <span>צריך ציוד מיוחד?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">לא. התוכנית מבוססת על אימוני משקל גוף — שכיבות, ריצה, פלאנק, ועוד. אפשר להתאמן
+              בבית, בפארק, או בחצר. אם יש לך ציוד — המאמן ישלב אותו.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+            <span>כמה זמן כל אימון?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">בין 20 ל-40 דקות, תלוי ביום ובסוג האימון. יש ימי ריצה קצרים ויש ימי כוח ארוכים
+              יותר. הכל מותאם ללו״ז שלך.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+            <span>אין לי ניסיון באימונים — זה בסדר?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">בהחלט. המאמן AI מתאים את התוכנית לרמה שלך. אם מתחילים מאפס — התוכנית תהיה
+              מתאימה. אם כבר יש רמה — היא תהיה מאתגרת.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
+            <span>צריך אישור הורים?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">כן. הפיילוט מיועד לגילאי 12-17. נבקש אישור הורים לפני ההתחלה — ניצור קשר דרך
+              ה-WhatsApp שתשאירו בטופס.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTRATION FORM -->
+  <div class="form-section" id="register">
+    <div class="form-section-inner">
+
+      <div class="form-headline reveal">
+        <h2>מוכן<br>להתחיל?</h2>
+        <p class="text">מקומות מוגבלים. 20-30 מתאמנים בלבד. השאירו פרטים ונחזור אליכם.</p>
+        <div class="spots-badge">
+          <span class="spots-dot"></span>
+          נשארו 7 מקומות מתוך 15
+        </div>
+        <span class="form-dec-word" aria-hidden="true">JOIN</span>
+      </div>
+
+      <div class="reveal">
+        <div class="form-card" id="formCard">
+          <form id="waitlistForm" onsubmit="handleSubmit(event)">
+            <div class="form-field">
+              <label for="name">NAME / שם</label>
+              <input type="text" id="name" name="name" required placeholder="השם שלך">
+            </div>
+
+            <div class="form-row-fields">
+              <div class="form-field">
+                <label for="age">AGE / גיל</label>
+                <select id="age" name="age" required>
+                  <option value="" disabled selected>בחר/י</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="phone">PHONE / טלפון</label>
+                <input type="tel" id="phone" name="phone" required placeholder="050-0000000" dir="ltr">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="goal">GOAL / מטרה</label>
+              <select id="goal" name="goal" required>
+                <option value="" disabled selected>בחר/י מטרה</option>
+                <option value="running">לרוץ יותר מהר / יותר רחוק</option>
+                <option value="strength">להיות יותר חזק/ה</option>
+                <option value="sport">להשתפר בספורט</option>
+                <option value="army">להגיע מוכן/ה לצבא</option>
+                <option value="other">אחר</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="freetext">MORE / עוד משהו? (אופציונלי)</label>
+              <textarea id="freetext" name="freetext"
+                placeholder="למשל: באיזה ספורט אתה משחק, כמה פעמים בשבוע אתה מתאמן..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">SUBMIT × הירשמו לרשימת ההמתנה ✋</button>
+          </form>
+        </div>
+
+        <div class="success-msg" id="successMsg">
+          <div class="success-check">✓</div>
+          <h3>נרשמת!</h3>
+          <p>קיבלנו את הפרטים. ניצור איתך קשר ב-WhatsApp עם כל הפרטים על הפיילוט. תתכוננו — זה הולך להיות 30 יום
+            רציניים. 🔥</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">5ED</div>
+      <div class="footer-links">
+        <a href="#register">הרשמה לפיילוט</a>
+        <a href="https://wa.me/972500000000" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="mailto:info@5ed.co.il">יצירת קשר</a>
+      </div>
+      <p class="footer-copy">פיילוט 2026 | חמש אצבעות</p>
+      <a href="#" class="back-to-top-link">BACK TO TOP ↑</a>
+    </div>
+  </footer>
+
+  <script>
+    // --- REVEAL ON SCROLL ---
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const delay = parseInt(entry.target.dataset.delay) || 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          revealObserver.unobserve(entry.target);
+        }
       });
-      coachObserver.unobserve(entry.target);
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-scale, .step-row').forEach(el => {
+      revealObserver.observe(el);
+    });
+
+    // --- STICKY NAV ---
+    const stickyNav = document.getElementById('stickyNav');
+    const heroSection = document.getElementById('heroSection');
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          stickyNav.classList.remove('nav--scrolled');
+        } else {
+          stickyNav.classList.add('nav--scrolled');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    navObserver.observe(heroSection);
+
+    // --- BACK TO TOP ---
+    const backToTop = document.getElementById('backToTop');
+    const statsSection = document.getElementById('statsSection');
+
+    const backTopObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          backToTop.classList.remove('visible');
+        } else {
+          backToTop.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -100% 0px' });
+
+    backTopObserver.observe(statsSection);
+
+    // --- COUNT-UP ANIMATION ---
+    const countElements = document.querySelectorAll('[data-count]');
+    const countObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.count);
+          const suffix = el.dataset.suffix || '';
+          const duration = 1200;
+          const start = performance.now();
+
+          function update(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(target * eased);
+            el.textContent = current + suffix;
+            if (progress < 1) requestAnimationFrame(update);
+          }
+
+          requestAnimationFrame(update);
+          countObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    countElements.forEach(el => countObserver.observe(el));
+
+    // --- WORKOUT PLAN SEQUENTIAL ANIMATION ---
+    const coachPhone = document.getElementById('coachPhone');
+    const planObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const items = entry.target.querySelectorAll('[data-plan]');
+          items.forEach((item, i) => {
+            setTimeout(() => {
+              item.classList.add('plan-visible');
+            }, 300 + 650 * i);
+          });
+          planObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    if (coachPhone) planObserver.observe(coachPhone);
+
+    // --- SMOOTH SCROLL ---
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // --- FAQ ACCORDION ---
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const answer = item.querySelector('.faq-answer');
+      const isOpen = item.classList.contains('open');
+
+      // Close all other items
+      document.querySelectorAll('.faq-item.open').forEach(openItem => {
+        if (openItem !== item) {
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+          openItem.querySelector('.faq-answer').style.maxHeight = '0';
+        }
+      });
+
+      if (isOpen) {
+        item.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        answer.style.maxHeight = '0';
+      } else {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      }
     }
-  });
-}, { threshold: 0.3 });
 
-if (coachPhone) coachObserver.observe(coachPhone);
+    // --- FORM HANDLING ---
+    function handleSubmit(e) {
+      e.preventDefault();
 
-// --- SMOOTH SCROLL ---
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
-  });
-});
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'שולח...';
 
-// --- FAQ ACCORDION ---
-function toggleFaq(btn) {
-  const item = btn.parentElement;
-  const answer = item.querySelector('.faq-answer');
-  const isOpen = item.classList.contains('open');
+      const data = {
+        name: document.getElementById('name').value,
+        age: document.getElementById('age').value,
+        phone: document.getElementById('phone').value,
+        goal: document.getElementById('goal').value,
+        freetext: document.getElementById('freetext').value,
+        timestamp: new Date().toISOString()
+      };
 
-  // Close all other items
-  document.querySelectorAll('.faq-item.open').forEach(openItem => {
-    if (openItem !== item) {
-      openItem.classList.remove('open');
-      openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
-      openItem.querySelector('.faq-answer').style.maxHeight = '0';
+      // TODO: Replace with your actual endpoint
+      // Option 1: Supabase insert
+      // Option 2: Google Sheets webhook
+      // Option 3: Simple email via Formspree/Getform
+
+      console.log('Waitlist signup:', data);
+
+      // For now, simulate success
+      setTimeout(() => {
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('successMsg').classList.add('show');
+      }, 800);
+
+      // UNCOMMENT THIS when you have an endpoint:
+      /*
+      fetch('YOUR_ENDPOINT_HERE', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(r => {
+        if (r.ok) {
+          document.getElementById('formCard').style.display = 'none';
+          document.getElementById('successMsg').classList.add('show');
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'SUBMIT × הירשמו לרשימת ההמתנה ✋';
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.textContent = 'SUBMIT × הירשמו לרשימת ההמתנה ✋';
+      });
+      */
     }
-  });
-
-  if (isOpen) {
-    item.classList.remove('open');
-    btn.setAttribute('aria-expanded', 'false');
-    answer.style.maxHeight = '0';
-  } else {
-    item.classList.add('open');
-    btn.setAttribute('aria-expanded', 'true');
-    answer.style.maxHeight = answer.scrollHeight + 'px';
-  }
-}
-
-// --- FORM HANDLING ---
-function handleSubmit(e) {
-  e.preventDefault();
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'שולח...';
-
-  const data = {
-    name: document.getElementById('name').value,
-    age: document.getElementById('age').value,
-    phone: document.getElementById('phone').value,
-    goal: document.getElementById('goal').value,
-    freetext: document.getElementById('freetext').value,
-    timestamp: new Date().toISOString()
-  };
-
-  // TODO: Replace with your actual endpoint
-  // Option 1: Supabase insert
-  // Option 2: Google Sheets webhook
-  // Option 3: Simple email via Formspree/Getform
-
-  console.log('Waitlist signup:', data);
-
-  // For now, simulate success
-  setTimeout(() => {
-    document.getElementById('waitlistForm').style.display = 'none';
-    document.querySelector('.form-card').style.display = 'none';
-    document.getElementById('successMsg').classList.add('show');
-  }, 800);
-
-  // UNCOMMENT THIS when you have an endpoint:
-  /*
-  fetch('YOUR_ENDPOINT_HERE', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  .then(r => {
-    if (r.ok) {
-      document.getElementById('waitlistForm').style.display = 'none';
-      document.querySelector('.form-card').style.display = 'none';
-      document.getElementById('successMsg').classList.add('show');
-    } else {
-      btn.disabled = false;
-      btn.textContent = 'משהו השתבש — נסה שוב';
-    }
-  })
-  .catch(() => {
-    btn.disabled = false;
-    btn.textContent = 'משהו השתבש — נסה שוב';
-  });
-  */
-}
-</script>
+  </script>
 
 </body>
+
 </html>
