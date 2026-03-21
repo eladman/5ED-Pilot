@@ -496,19 +496,6 @@
       overflow: hidden;
     }
 
-    .coach-meta-dec {
-      position: absolute;
-      bottom: -10px;
-      right: 16px;
-      font-family: var(--font-display);
-      font-size: clamp(5rem, 9vw, 7rem);
-      font-weight: 700;
-      color: var(--muted);
-      line-height: 1;
-      pointer-events: none;
-      user-select: none;
-      letter-spacing: -0.04em;
-    }
 
     .coach-meta-items {
       position: relative;
@@ -928,6 +915,47 @@
       line-height: 1.8;
     }
 
+    /* --- REQUIREMENTS --- */
+    .req-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: var(--border-w) solid var(--border);
+    }
+
+    .req-item {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .req-item:last-child {
+      border-bottom: none;
+    }
+
+    .req-num {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+      opacity: 0.8;
+    }
+
+    .req-item p {
+      font-size: 16px;
+      color: var(--muted-fg);
+      line-height: 1.6;
+    }
+
+    .req-item p strong {
+      color: var(--fg);
+    }
+
     /* --- FORM SECTION --- */
     .form-section {
       padding: 96px 40px;
@@ -949,17 +977,6 @@
       margin-bottom: 16px;
     }
 
-    .form-dec-word {
-      font-family: var(--font-display);
-      font-size: clamp(5rem, 9vw, 7.5rem);
-      font-weight: 700;
-      color: var(--muted);
-      line-height: 1;
-      letter-spacing: -0.04em;
-      display: block;
-      margin-top: 16px;
-      user-select: none;
-    }
 
     .spots-badge {
       display: inline-flex;
@@ -1435,9 +1452,6 @@
         display: none;
       }
 
-      .form-dec-word {
-        display: none;
-      }
 
       /* Steps */
       .step-row {
@@ -1526,7 +1540,7 @@
   <!-- STICKY NAV -->
   <nav class="site-nav" id="stickyNav">
     <div class="nav-logo">5ED</div>
-    <div class="nav-badge">× חמש אצבעות</div>
+    <div class="nav-badge"> חמש אצבעות</div>
     <a href="#register" class="nav-cta">הירשמו עכשיו</a>
   </nav>
 
@@ -1553,20 +1567,6 @@
         <a href="#about" class="btn-outline">קרא עוד ↓</a>
       </div>
 
-      <div class="hero-stats" id="statsSection">
-        <div class="hero-stat">
-          <span class="hero-stat-num" data-count="30">0</span>
-          <span class="hero-stat-label">ימי תוכנית</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-num">AI</span>
-          <span class="hero-stat-label">מאמן אישי</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-num" data-count="0" data-suffix="₪">0₪</span>
-          <span class="hero-stat-label">חינם לפיילוט</span>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1590,7 +1590,7 @@
 
       <div class="stat-cards reveal">
         <div class="stat-card">
-          <div class="stat-card__num" data-count="30">0</div>
+          <div class="stat-card__num" data-count="30">30</div>
           <div class="stat-card__label">ימי תוכנית</div>
         </div>
         <div class="stat-card">
@@ -1598,8 +1598,8 @@
           <div class="stat-card__label">מאמן אישי</div>
         </div>
         <div class="stat-card">
-          <div class="stat-card__num" data-count="0" data-suffix="₪">0₪</div>
-          <div class="stat-card__label">חינם לפיילוט</div>
+          <div class="stat-card__num"  data-suffix="הזדמנות">הזדמנות</div>
+          <div class="stat-card__label">להשפיע ולקחת חלק בבניית האפליקציה</div>
         </div>
       </div>
     </div>
@@ -1619,7 +1619,7 @@
           <div class="step-content">
             <span class="step-tag">ONBOARDING</span>
             <h3>בוחרים מטרה</h3>
-            <p>רוצה לרוץ יותר מהר? להיות יותר חזק? להגיע מוכן לצבא? המאמן AI מתחיל מהמטרה שלך.</p>
+            <p>רוצה לרוץ יותר מהר? להיות יותר חזק/ה? להגיע מוכן/ה לצבא? המאמן AI מתחיל מהמטרה שלך.</p>
           </div>
         </div>
         <div class="step-row" data-delay="100">
@@ -1627,7 +1627,7 @@
           <div class="step-content">
             <span class="step-tag">ASSESS</span>
             <h3>בדיקת רמה</h3>
-            <p>מבחן קצר (3 דקות) — כמה שכיבות, כמה ריצה, כמה פלאנק. ככה המאמן יודע מאיפה מתחילים.</p>
+            <p>המאמן מנתח את תוצאות המדדים האחרונים (או הזנה ידנית) ומבין את הרמה הנוכחית שלך.</p>
           </div>
         </div>
         <div class="step-row" data-delay="200">
@@ -1643,7 +1643,7 @@
           <div class="step-content">
             <span class="step-tag">TRAIN</span>
             <h3>מתאמנים ושוברים שיאים</h3>
-            <p>כל יום פותחים את האפליקציה → מקבלים את האימון → עושים → רואים שיפור. 30 יום — before ו-after.</p>
+            <p>כל יום פותחים את האפליקציה ← מקבלים את האימון ← עושים  ← רואים שיפור. 30 יום.</p>
           </div>
         </div>
       </div>
@@ -1662,8 +1662,7 @@
 
       <div class="coach-grid reveal-scale" id="coachPhone">
         <div class="coach-meta">
-          <span class="coach-meta-dec" aria-hidden="true">AI</span>
-          <div class="coach-meta-items">
+<div class="coach-meta-items">
             <div class="coach-meta-item">
               <div class="coach-meta-key">STATUS</div>
               <div class="coach-meta-val">
@@ -1722,12 +1721,10 @@
           <div class="plan-day" data-plan="day3">
             <div class="plan-day-header">
               <span class="plan-day-name">יום ה׳</span>
-              <span class="plan-day-type cardio">סיבולת</span>
+              <span class="plan-day-type cardio">אימון ראש</span>
             </div>
             <ul class="plan-exercises">
-              <li>ריצה רציפה 20 דקות</li>
-              <li>ברפי 3×10</li>
-              <li>קפיצות 3×15</li>
+              <li>תוכן מקצועי / העשרה</li>
             </ul>
           </div>
         </div>
@@ -1764,63 +1761,25 @@
     </div>
   </section>
 
-  <!-- FAQ -->
+  <!-- REQUIREMENTS -->
   <section class="section">
     <div class="section-inner">
       <div class="reveal">
-        <h2>יש שאלות?<br><em>יש תשובות.</em></h2>
+        <h2>דרישות<br><em>הרשמה</em></h2>
       </div>
 
-      <div class="faq-container reveal">
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-            <span>זה באמת בחינם?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">כן. הפיילוט הראשון הוא לגמרי בחינם. אנחנו בשלב בנייה ורוצים לבדוק את המערכת עם
-              קבוצה קטנה. בתמורה — אתם מקבלים תוכנית אימון אישית, ואנחנו מקבלים פידבק שעוזר לנו להשתפר.</div>
-          </div>
+      <div class="req-list reveal">
+        <div class="req-item">
+          <span class="req-num">01</span>
+          <p>להיות רשומים לחמש אצבעות לפחות <strong>3 חודשים</strong></p>
         </div>
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-            <span>צריך ציוד מיוחד?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">לא. התוכנית מבוססת על אימוני משקל גוף — שכיבות, ריצה, פלאנק, ועוד. אפשר להתאמן
-              בבית, בפארק, או בחצר. אם יש לך ציוד — המאמן ישלב אותו.</div>
-          </div>
+        <div class="req-item">
+          <span class="req-num">02</span>
+          <p>להתחייב להגעה ל-<strong>2 מפגשים פיזיים</strong> שיתקיימו בארנה הרצליה</p>
         </div>
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-            <span>כמה זמן כל אימון?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">בין 20 ל-40 דקות, תלוי ביום ובסוג האימון. יש ימי ריצה קצרים ויש ימי כוח ארוכים
-              יותר. הכל מותאם ללו״ז שלך.</div>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-            <span>אין לי ניסיון באימונים — זה בסדר?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">בהחלט. המאמן AI מתאים את התוכנית לרמה שלך. אם מתחילים מאפס — התוכנית תהיה
-              מתאימה. אם כבר יש רמה — היא תהיה מאתגרת.</div>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" aria-expanded="false" onclick="toggleFaq(this)">
-            <span>צריך אישור הורים?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">כן. הפיילוט מיועד לגילאי 12-17. נבקש אישור הורים לפני ההתחלה — ניצור קשר דרך
-              ה-WhatsApp שתשאירו בטופס.</div>
-          </div>
+        <div class="req-item">
+          <span class="req-num">03</span>
+          <p><strong>אישור הורים</strong></p>
         </div>
       </div>
     </div>
@@ -1831,26 +1790,25 @@
     <div class="form-section-inner">
 
       <div class="form-headline reveal">
-        <h2>מוכן<br>להתחיל?</h2>
-        <p class="text">מקומות מוגבלים. 20-30 מתאמנים בלבד. השאירו פרטים ונחזור אליכם.</p>
+        <h2>מוכנים<br>להתחיל?</h2>
+        <p class="text">מקומות מוגבלים. 20-30 מתאמנים ומתאמנות בלבד. השאירו פרטים ונחזור אליכם.</p>
         <div class="spots-badge">
           <span class="spots-dot"></span>
-          נשארו 7 מקומות מתוך 15
+          ההרשמה בעיצומה
         </div>
-        <span class="form-dec-word" aria-hidden="true">JOIN</span>
       </div>
 
       <div class="reveal">
         <div class="form-card" id="formCard">
           <form id="waitlistForm" onsubmit="handleSubmit(event)">
             <div class="form-field">
-              <label for="name">NAME / שם</label>
+              <label for="name">שם</label>
               <input type="text" id="name" name="name" required placeholder="השם שלך">
             </div>
 
             <div class="form-row-fields">
               <div class="form-field">
-                <label for="age">AGE / גיל</label>
+                <label for="age">גיל</label>
                 <select id="age" name="age" required>
                   <option value="" disabled selected>בחר/י</option>
                   <option value="12">12</option>
@@ -1862,30 +1820,17 @@
                 </select>
               </div>
               <div class="form-field">
-                <label for="phone">PHONE / טלפון</label>
+                <label for="phone">טלפון</label>
                 <input type="tel" id="phone" name="phone" required placeholder="050-0000000" dir="ltr">
               </div>
             </div>
-
             <div class="form-field">
-              <label for="goal">GOAL / מטרה</label>
-              <select id="goal" name="goal" required>
-                <option value="" disabled selected>בחר/י מטרה</option>
-                <option value="running">לרוץ יותר מהר / יותר רחוק</option>
-                <option value="strength">להיות יותר חזק/ה</option>
-                <option value="sport">להשתפר בספורט</option>
-                <option value="army">להגיע מוכן/ה לצבא</option>
-                <option value="other">אחר</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <label for="freetext">MORE / עוד משהו? (אופציונלי)</label>
+              <label for="freetext">למה אתם חושבים שאתם הכי מתאימים?</label>
               <textarea id="freetext" name="freetext"
-                placeholder="למשל: באיזה ספורט אתה משחק, כמה פעמים בשבוע אתה מתאמן..."></textarea>
+                placeholder="פירוט"></textarea>
             </div>
 
-            <button type="submit" class="submit-btn" id="submitBtn">SUBMIT × הירשמו לרשימת ההמתנה ✋</button>
+            <button type="submit" class="submit-btn" id="submitBtn">הירשמו לרשימת ההמתנה ✋</button>
           </form>
         </div>
 
@@ -1906,8 +1851,6 @@
       <div class="footer-logo">5ED</div>
       <div class="footer-links">
         <a href="#register">הרשמה לפיילוט</a>
-        <a href="https://wa.me/972500000000" target="_blank" rel="noopener">WhatsApp</a>
-        <a href="mailto:info@5ed.co.il">יצירת קשר</a>
       </div>
       <p class="footer-copy">פיילוט 2026 | חמש אצבעות</p>
       <a href="#" class="back-to-top-link">BACK TO TOP ↑</a>
@@ -1950,7 +1893,7 @@
 
     // --- BACK TO TOP ---
     const backToTop = document.getElementById('backToTop');
-    const statsSection = document.getElementById('statsSection');
+    const statsSection = document.getElementById('about');
 
     const backTopObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -1962,7 +1905,7 @@
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -100% 0px' });
 
-    backTopObserver.observe(statsSection);
+    if (statsSection) backTopObserver.observe(statsSection);
 
     // --- COUNT-UP ANIMATION ---
     const countElements = document.querySelectorAll('[data-count]');
