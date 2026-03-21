@@ -208,6 +208,44 @@
       margin-bottom: 36px;
     }
 
+    /* Atmospheric glow overlay */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(255,135,20,0.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Top decorative bar — hidden on desktop, shown on mobile */
+    .hero-top {
+      display: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-live {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      white-space: nowrap;
+      animation: pulse-live 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-live {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    .hero-track-lines {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to left, transparent, var(--border) 30%, var(--border) 70%, transparent);
+      margin-inline-start: 16px;
+    }
+
     .hero-ctas {
       display: flex;
       gap: 12px;
@@ -1381,8 +1419,15 @@
     /* --- RESPONSIVE: MOBILE --- */
     @media (max-width: 480px) {
       .hero {
-        justify-content: flex-start;
-        padding: 80px 20px 40px;
+        justify-content: space-between;
+        padding: 24px 24px 40px;
+      }
+
+      .hero-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
       }
 
       .hero-bg-num {
@@ -1409,16 +1454,16 @@
 
       /* Hero typography */
       h1 {
-        font-size: clamp(2.25rem, 11vw, 3.5rem);
+        font-size: clamp(4rem, 22vw, 11rem);
       }
 
       .h1-outline {
-        -webkit-text-stroke: 1px var(--accent);
+        -webkit-text-stroke: 3px var(--accent);
       }
 
       .hero-sub {
         max-width: 100%;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
       }
 
       /* Hero CTAs — stack full-width */
@@ -1550,6 +1595,10 @@
   <!-- HERO -->
   <div class="hero" id="heroSection">
     <span class="hero-bg-num" aria-hidden="true">5</span>
+    <div class="hero-top" aria-hidden="true">
+      <span class="hero-live">● פיילוט פעיל</span>
+      <div class="hero-track-lines"></div>
+    </div>
     <div class="hero-content">
       <div class="hero-badge">אפליקציית חמש אצבעות</div>
       <h1>
