@@ -1111,6 +1111,67 @@
       min-height: 90px;
     }
 
+    .team-combobox {
+      position: relative;
+    }
+
+    .team-combobox input[type="text"] {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-weight: 700;
+      padding: 2px 24px 14px;
+      outline: none;
+      cursor: text;
+    }
+
+    .team-combobox input[type="text"]::placeholder {
+      color: var(--border);
+      font-weight: 400;
+    }
+
+    .team-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      background: #111116;
+      border: var(--border-w) solid var(--border);
+      border-top: none;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .team-dropdown.open {
+      display: block;
+    }
+
+    .team-option {
+      padding: 10px 24px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--fg);
+      transition: background var(--t-fast);
+    }
+
+    .team-option:hover,
+    .team-option.highlighted {
+      background: var(--muted);
+      color: var(--accent);
+    }
+
+    .team-option.no-results {
+      color: var(--muted-fg);
+      cursor: default;
+    }
+
     .form-row-fields {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1185,6 +1246,249 @@
       color: var(--muted-fg);
       font-size: 15px;
       line-height: 1.7;
+    }
+
+    /* --- FULL SCREEN SUCCESS OVERLAY --- */
+    #successOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      overflow: hidden;
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    #successOverlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Large background "5" watermark */
+    .success-bg-num {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-size: min(82vw, 82vh);
+      font-weight: 700;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 135, 20, 0.05);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.06em;
+    }
+
+    /* Orange center glow */
+    #successOverlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 55% 50% at 50% 50%, rgba(255, 135, 20, 0.11) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .success-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 640px;
+      width: 100%;
+    }
+
+    /* All children start invisible */
+    .success-content > * {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    /* Staggered reveal animations */
+    #successOverlay.active .success-badge-line {
+      animation: successReveal 0.5s ease 0.15s forwards;
+    }
+    #successOverlay.active .success-icon-wrap {
+      animation: successPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s forwards;
+    }
+    #successOverlay.active .success-heading {
+      animation: successReveal 0.6s ease 0.65s forwards;
+    }
+    #successOverlay.active .success-divider {
+      animation: successReveal 0.5s ease 0.88s forwards;
+    }
+    #successOverlay.active .success-sub {
+      animation: successReveal 0.5s ease 1.05s forwards;
+    }
+    #successOverlay.active .success-back-btn {
+      animation: successReveal 0.5s ease 1.25s forwards;
+    }
+
+    @keyframes successReveal {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes successPop {
+      from { opacity: 0; transform: scale(0.65); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Pulsing border on icon after entry */
+    #successOverlay.active .success-icon {
+      animation: iconBorderPulse 2.5s ease-in-out 1.3s infinite;
+    }
+
+    @keyframes iconBorderPulse {
+      0%, 100% { border-color: var(--accent); }
+      50%       { border-color: rgba(255, 135, 20, 0.35); }
+    }
+
+    /* Top badge */
+    .success-badge-line {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .success-badge-dash {
+      height: 1px;
+      width: 40px;
+      background: var(--accent);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+
+    .success-badge-text {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    /* Check icon */
+    .success-icon-wrap {
+      margin-bottom: 28px;
+    }
+
+    .success-icon {
+      width: 76px;
+      height: 76px;
+      border: var(--border-w) solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Corner accent squares */
+    .success-icon::before,
+    .success-icon::after {
+      content: '';
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      background: var(--accent);
+    }
+    .success-icon::before { top: -4px; right: -4px; }
+    .success-icon::after  { bottom: -4px; left: -4px; }
+
+    .success-checkmark {
+      font-family: var(--font-display);
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    /* Big heading */
+    .success-heading {
+      font-family: var(--font-body);
+      font-size: clamp(5.5rem, 19vw, 11rem);
+      font-weight: 900;
+      line-height: 0.88;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      color: var(--fg);
+      margin-bottom: 0;
+    }
+
+    /* Orange divider */
+    .success-divider {
+      width: 100%;
+      max-width: 400px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--accent) 25%, var(--accent) 75%, transparent);
+      margin: 28px 0;
+      flex-shrink: 0;
+    }
+
+    /* Sub text */
+    .success-sub {
+      font-size: clamp(0.9rem, 1.3vw, 1rem);
+      color: var(--muted-fg);
+      line-height: 1.8;
+      max-width: 460px;
+      margin-bottom: 36px;
+    }
+
+    .success-sub strong {
+      color: var(--fg);
+    }
+
+    /* Back button */
+    .success-back-btn {
+      background: transparent;
+      color: var(--muted-fg);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0 28px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      text-decoration: none;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+    }
+
+    .success-back-btn:hover {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
+    }
+
+    @media (max-width: 480px) {
+      .success-heading {
+        font-size: clamp(4.5rem, 23vw, 8rem);
+      }
+      .success-badge-dash {
+        width: 24px;
+      }
+      .success-icon {
+        width: 60px;
+        height: 60px;
+      }
+      .success-checkmark {
+        font-size: 26px;
+      }
     }
 
     /* --- FOOTER --- */
@@ -1545,6 +1849,11 @@
         background-position: 16px center;
       }
 
+      .team-combobox input[type="text"] {
+        padding: 4px 16px 12px;
+        min-height: 44px;
+      }
+
       /* Footer */
       footer {
         padding: 24px 20px;
@@ -1855,6 +2164,15 @@
               <input type="text" id="name" name="name" required placeholder="השם שלך">
             </div>
 
+            <div class="form-field team-field" id="teamField">
+              <label for="teamSearch">קבוצה</label>
+              <div class="team-combobox">
+                <input type="text" id="teamSearch" autocomplete="off" placeholder="חפש/י קבוצה..." />
+                <input type="hidden" id="team" name="team" required />
+                <div class="team-dropdown" id="teamDropdown" role="listbox"></div>
+              </div>
+            </div>
+
             <div class="form-row-fields">
               <div class="form-field">
                 <label for="age">גיל</label>
@@ -1905,6 +2223,27 @@
       <a href="#" class="back-to-top-link">BACK TO TOP ↑</a>
     </div>
   </footer>
+
+  <!-- FULL SCREEN SUCCESS OVERLAY -->
+  <div id="successOverlay" role="dialog" aria-modal="true" aria-label="הרשמה הצליחה">
+    <div class="success-bg-num" aria-hidden="true">5</div>
+    <div class="success-content">
+      <div class="success-badge-line">
+        <div class="success-badge-dash"></div>
+        <span class="success-badge-text">● פיילוט 5ED מאושר</span>
+        <div class="success-badge-dash"></div>
+      </div>
+      <div class="success-icon-wrap">
+        <div class="success-icon">
+          <span class="success-checkmark">✓</span>
+        </div>
+      </div>
+      <div class="success-heading">נרשמת!</div>
+      <div class="success-divider"></div>
+      <p class="success-sub">קיבלנו את הפרטים שלך. ניצור איתך קשר ב-WhatsApp עם כל הפרטים על הפיילוט.<br><strong>תתכוננו — זה הולך להיות 30 יום רציניים.</strong></p>
+      <button class="success-back-btn" onclick="location.reload()">← חזרה לאתר</button>
+    </div>
+  </div>
 
   <script>
     // --- REVEAL ON SCROLL ---
@@ -2037,9 +2376,84 @@
       }
     }
 
+    // --- TEAM COMBOBOX ---
+    const TEAMS = [
+      "גבעת שמואל ילדים", "זכרון יעקב נערים", "עמק יזרעאל ילדות",
+      "תל אביב ילדים", "עמק חפר מזרח נוער בנות", "הרצליה נוער בנים",
+      "קריית טבעון ילדים", "כפר יונה נוער בנים",
+      "עמק חפר מזרח נוער בנים", "כפר יונה נוער בנות",
+      "כפר יונה ילדים", "אבן יהודה נוער בנות",
+      "זכרון יעקב נוער בנות", "כפר סבא נוער בנות", "תל אביב נוער בנים",
+      "רמת ישי ג-ד", "רמת ישי ה-ו", "תל אביב נוער בנות", "תל מונד נוער בנים",
+      "עמק חפר נערים", "כפר סבא ילדים", "תל מונד ילדים", "קרית אונו נוער בנים",
+      "הוד השרון נערים", "כוכב יאיר נערות", "הוד השרון נוער בנים",
+      "הוד השרון ילדים", "עמק יזרעאל נוער בנות", "הרצליה נוער בנות",
+      "עמק חפר בנות", "עמק חפר בנים", "רעננה נערים", "עמק יזרעאל נוער בנים",
+      "הוד השרון נוער בנות", "קרית אונו נוער בנות", "קריית טבעון נוער בנות",
+      "רעננה נוער בנות", "זכרון יעקב ילדים", "אבן יהודה נערים",
+      "כפר סבא נוער בנים", "עמק חפר מזרח ילדים", "רעננה נוער בנים",
+      "הרצליה ילדים", "הרצליה נערים", "תל אביב נערים", "גבעת שמואל נוער בנים",
+      "גבעת שמואל נערים", "קריית טבעון נוער בנים", "עמק יזרעאל ילדים",
+      "כוכב יאיר ילדים"
+    ];
+
+    (function initTeamCombobox() {
+      const searchInput = document.getElementById('teamSearch');
+      const hiddenInput = document.getElementById('team');
+      const dropdown = document.getElementById('teamDropdown');
+
+      function renderOptions(filter) {
+        const q = filter.trim();
+        const matches = q ? TEAMS.filter(t => t.includes(q)) : TEAMS;
+        dropdown.innerHTML = '';
+        if (!matches.length) {
+          dropdown.innerHTML = '<div class="team-option no-results">לא נמצאו תוצאות</div>';
+        } else {
+          matches.forEach(team => {
+            const el = document.createElement('div');
+            el.className = 'team-option';
+            el.textContent = team;
+            el.setAttribute('role', 'option');
+            el.addEventListener('mousedown', (e) => {
+              e.preventDefault();
+              selectTeam(team);
+            });
+            dropdown.appendChild(el);
+          });
+        }
+      }
+
+      function selectTeam(team) {
+        searchInput.value = team;
+        hiddenInput.value = team;
+        dropdown.classList.remove('open');
+      }
+
+      searchInput.addEventListener('focus', () => {
+        renderOptions(searchInput.value);
+        dropdown.classList.add('open');
+      });
+
+      searchInput.addEventListener('input', () => {
+        hiddenInput.value = '';
+        renderOptions(searchInput.value);
+        dropdown.classList.add('open');
+      });
+
+      searchInput.addEventListener('blur', () => {
+        if (!hiddenInput.value) searchInput.value = '';
+        dropdown.classList.remove('open');
+      });
+    })();
+
     // --- FORM HANDLING ---
     function handleSubmit(e) {
       e.preventDefault();
+
+      if (!document.getElementById('team').value) {
+        document.getElementById('teamSearch').focus();
+        return;
+      }
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
@@ -2047,47 +2461,29 @@
 
       const data = {
         name: document.getElementById('name').value,
+        team: document.getElementById('team').value,
         age: document.getElementById('age').value,
         phone: document.getElementById('phone').value,
-        goal: document.getElementById('goal').value,
         freetext: document.getElementById('freetext').value,
         timestamp: new Date().toISOString()
       };
 
-      // TODO: Replace with your actual endpoint
-      // Option 1: Supabase insert
-      // Option 2: Google Sheets webhook
-      // Option 3: Simple email via Formspree/Getform
+      const SHEET_URL = 'https://script.google.com/macros/s/AKfycby33g2ZQ6oWaO1n5a2Re6Tk-ZdAk-xq3xO82FTigeEMT5ceHIVOCV5OXJa3njTBXbA3/exec';
 
-      console.log('Waitlist signup:', data);
-
-      // For now, simulate success
-      setTimeout(() => {
-        document.getElementById('formCard').style.display = 'none';
-        document.getElementById('successMsg').classList.add('show');
-      }, 800);
-
-      // UNCOMMENT THIS when you have an endpoint:
-      /*
-      fetch('YOUR_ENDPOINT_HERE', {
+      fetch(SHEET_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(data)
       })
-      .then(r => {
-        if (r.ok) {
-          document.getElementById('formCard').style.display = 'none';
-          document.getElementById('successMsg').classList.add('show');
-        } else {
-          btn.disabled = false;
-          btn.textContent = 'SUBMIT × הירשמו לרשימת ההמתנה ✋';
-        }
+      .then(() => {
+        document.getElementById('successOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
       })
       .catch(() => {
         btn.disabled = false;
-        btn.textContent = 'SUBMIT × הירשמו לרשימת ההמתנה ✋';
+        btn.textContent = 'הירשמו לרשימת ההמתנה ✋';
       });
-      */
     }
   </script>
 
